@@ -1,0 +1,11 @@
+{
+  "twilio_account_sid": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "twilio_auth_token": "your_twilio_auth_token_here",
+  "twilio_whatsapp_from": "whatsapp:+14155238886",
+  "email_from": "",
+  "email_password": "",
+  "smtp_server": "smtp.gmail.com",
+  "smtp_port": 587,
+  "enable_voice": true,
+  "enable_toasts": true
+}

@@ -1,0 +1,9 @@
+{
+  "name": "event-reminder-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Event Reminder web app with a Twilio WhatsApp backend, deployable on Vercel.",
+  "dependencies": {
+    "twilio": "^5.0.0"
+  }
+}

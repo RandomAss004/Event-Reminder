@@ -1,59 +1,85 @@
-# Event Reminder — with automatic WhatsApp (Twilio)
+# 🗓️ Event Reminder App — Enhanced Edition (v2.5)
 
-This folder is a complete, deployable version of the app:
-- `index.html` — the web app (same one you have on the Claude link)
-- `api/send-whatsapp.js` — a tiny backend that sends the WhatsApp message via Twilio
-- Your Twilio keys live only as environment variables on the hosting platform, never in the code
+A full-featured personal & team Event Reminder application featuring **offline background alerts**, **advance reminder warnings**, **event categories**, **venue location with Google Maps**, **automatic WhatsApp & Email delivery**, and a modern CustomTkinter interface.
 
-When this is deployed together (index.html + api/), the app calls its own
-`/api/send-whatsapp` automatically when a reminder fires — no manual tap needed.
-If that call fails for any reason, it quietly falls back to a "Send WhatsApp reminder"
-button, so the app never breaks.
+---
 
-## 1. Set up Twilio (5 min)
+## 🌟 What's New & Fixed
 
-1. Create a free account at https://www.twilio.com/try-twilio
-2. In the Twilio Console, go to **Messaging → Try it out → Send a WhatsApp message**.
-   This activates the **WhatsApp Sandbox** and gives you:
-   - A sandbox number, usually `+1 415 523 8886`
-   - A join code like `join xxxx-xxxx`
-3. **This is the step most people miss and get "bugs" from:** the sandbox can only
-   message numbers that have joined it. From the WhatsApp of every phone number you
-   want to remind (yours, your friends'), send that exact `join xxxx-xxxx` text to
-   the sandbox number on WhatsApp. Until they do this, Twilio will fail to deliver.
-   (For a real product later, you'd apply for a Twilio-approved WhatsApp Business
-   number, which can message anyone without this join step.)
-4. From the Console dashboard, copy your **Account SID** and **Auth Token**.
+### 1. 🛡️ Closed-App / Offline Reminders (Windows Task Scheduler)
+- **Problem Solved:** Previously, when the software was closed, background threads died and no reminders or messages were sent.
+- **Solution:** Every created/updated event is automatically registered into **Windows Task Scheduler** via `scheduler_service.py`.
+- When the event or reminder time arrives, Windows natively triggers `notifier.py` using `pythonw.exe` completely silently in the background — **even when the Event Reminder app is completely closed or turned off**!
 
-## 2. Push this folder to GitHub
+### 2. ⏰ Advance Reminders ("Remind Before")
+- Choose when you want to receive alerts before an event begins:
+  - `At event time`
+  - `5 minutes before`, `10 minutes before`, `15 minutes before`, `30 minutes before`
+  - `1 hour before` *(e.g. event is at 10 PM → alert sends at 9 PM)*
+  - `2 hours before`, `3 hours before`, `1 day before`, `2 days before`
+- The advance notice is clearly stated in the WhatsApp message, Windows Toast, voice announcement, and Email!
 
-Create a new repository and push these files (Account SID/Token do **not** go
-in any file here — only in Vercel's dashboard in step 3).
+### 3. 👶 Event Categories & Visual Badges
+- Choose from specialized event types with distinct color badges & icons:
+  - 👶 **Baby Shower**
+  - 🎂 **Birthday**
+  - 💍 **Wedding / Engagement**
+  - 💼 **Meeting / Work**
+  - 🏥 **Doctor / Health**
+  - 🎉 **Party / Celebration**
+  - 🎓 **Exam / Study**
+  - ✈️ **Travel / Trip**
+  - 💳 **Bill / Payment**
+  - 📌 **General**
+- Instant filter dropdown to show events by category.
 
-## 3. Deploy on Vercel (free)
+### 4. 📍 Event Location & Google Maps Integration
+- Enter venue, clinic, office, or hall names (e.g. `"Grand Celebration Banquet, Mumbai"`).
+- In the table: Click the **📍 View Map** button to open the location directly in **Google Maps**.
+- Windows Toasts include an action button to navigate directly on Maps.
+- WhatsApp messages include a direct Google Maps link.
 
-1. Go to https://vercel.com → sign up → **Add New Project** → import your GitHub repo.
-2. Before the first deploy, open **Settings → Environment Variables** and add:
-   | Name | Value |
-   |---|---|
-   | `TWILIO_ACCOUNT_SID` | from Twilio console |
-   | `TWILIO_AUTH_TOKEN` | from Twilio console |
-   | `TWILIO_WHATSAPP_FROM` | `whatsapp:+14155238886` (your sandbox number) |
-3. Deploy. Vercel gives you a public URL like `https://your-app.vercel.app` —
-   this is the link anyone can open, no Claude account needed.
-4. Open that URL, register/login, add an event with a phone number that has
-   joined your sandbox, and set the time a couple of minutes out to test.
+### 5. 📱 Background WhatsApp & ✉️ Email (via Settings)
+- **Twilio Cloud WhatsApp API**: Configured directly in the app's `⚙️ Settings` modal. Sends WhatsApp messages completely silently via cloud HTTP requests without needing a browser window open.
+- **pywhatkit Fallback**: Automatically used if Twilio is not configured.
+- **SMTP Email Alerts**: Supports Gmail (App Passwords), Outlook, or custom SMTP servers.
+- **🚀 Test Alert Button**: Click the rocket icon on any event to immediately test your WhatsApp, Toast, and Voice alert without waiting!
 
-## Notes
+---
 
-- The Claude-hosted link you already have will keep working exactly as before
-  (manual "Send WhatsApp" tap) — it can't reach this backend by design, since
-  that page is sandboxed for security. This Vercel link is the one with
-  automatic sending.
-- Twilio's WhatsApp Sandbox is meant for testing. Messages there also carry a
-  short Twilio disclaimer text and recipients must rejoin the sandbox roughly
-  every 72 hours of inactivity. For a permanent, disclaimer-free number, apply
-  for WhatsApp Business API access through Twilio (takes a few days, needs a
-  Meta Business verification).
-- Free tier limits: Twilio trial accounts have a small message credit; Vercel's
-  free tier is generous enough for a personal reminder app.
+## 🚀 Getting Started
+
+### 1. Install Dependencies
+```powershell
+pip install -r requirements.txt
+```
+
+### 2. Run the Desktop App
+```powershell
+cd C:\Users\DELL\Desktop\python\Event_Reminder-main
+python login.py
+```
+
+### 3. Login or Register
+- Multi-language support: **English**, **Hindi**, **Marathi**
+- Real-time password strength meter & secure SHA-256 storage
+- Opens the main dashboard with your personalized user profile.
+
+---
+
+## 📁 Key Project Files
+
+| File | Description |
+|---|---|
+| [`login.py`](file:///C:/Users/DELL/Desktop/python/Event_Reminder-main/login.py) | Modern login & registration screen with language switcher |
+| [`reminder.py`](file:///C:/Users/DELL/Desktop/python/Event_Reminder-main/reminder.py) | Main dashboard: categories, advance timing, location, table, search & sort |
+| [`scheduler_service.py`](file:///C:/Users/DELL/Desktop/python/Event_Reminder-main/scheduler_service.py) | Manages Windows Task Scheduler entries so alerts fire when app is closed |
+| [`notifier.py`](file:///C:/Users/DELL/Desktop/python/Event_Reminder-main/notifier.py) | Standalone background executor: sends Toasts, WhatsApp, Email, & Voice |
+| [`settings.json`](file:///C:/Users/DELL/Desktop/python/Event_Reminder-main/settings.json) | Local configuration for Twilio WhatsApp & SMTP Email |
+| [`requirements.txt`](file:///C:/Users/DELL/Desktop/python/Event_Reminder-main/requirements.txt) | Python dependencies |
+
+---
+
+## 👥 Authors & Team
+- **Team Lead:** Om A. Singh
+- **Team Members:** Aryan Gharat, Rohan Sarkate, Umar Patel, Shriven Muley, Atul Bawaskar

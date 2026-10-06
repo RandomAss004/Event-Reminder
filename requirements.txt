@@ -1,0 +1,9 @@
+customtkinter
+pyttsx3
+pywhatkit
+matplotlib
+tkcalendar
+CTkMessagebox
+winotify
+twilio
+requests
