@@ -1,0 +1,15 @@
+requirements*.txt
+*.py
+*.spec
+login.py
+reminder.py
+notifier.py
+scheduler_service.py
+users.json
+events*.json
+settings*.json
+PyWhatKit_DB.txt
+dist/
+build/
+__pycache__/
+*.d.ts

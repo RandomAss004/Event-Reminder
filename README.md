@@ -51,7 +51,7 @@ A full-featured personal & team Event Reminder application featuring **offline b
 
 ### 1. Install Dependencies
 ```powershell
-pip install -r requirements.txt
+pip install -r requirements-desktop.txt
 ```
 
 ### 2. Run the Desktop App
@@ -76,7 +76,7 @@ python login.py
 | [`scheduler_service.py`](file:///C:/Users/DELL/Desktop/python/Event_Reminder-main/scheduler_service.py) | Manages Windows Task Scheduler entries so alerts fire when app is closed |
 | [`notifier.py`](file:///C:/Users/DELL/Desktop/python/Event_Reminder-main/notifier.py) | Standalone background executor: sends Toasts, WhatsApp, Email, & Voice |
 | [`settings.json`](file:///C:/Users/DELL/Desktop/python/Event_Reminder-main/settings.json) | Local configuration for Twilio WhatsApp & SMTP Email |
-| [`requirements.txt`](file:///C:/Users/DELL/Desktop/python/Event_Reminder-main/requirements.txt) | Python dependencies |
+| [`requirements-desktop.txt`](file:///C:/Users/DELL/Desktop/python/Event_Reminder-main/requirements-desktop.txt) | Python dependencies for local desktop app |
 
 ---
 
