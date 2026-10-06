@@ -1,0 +1,1 @@
+date = date_var.get().strip()

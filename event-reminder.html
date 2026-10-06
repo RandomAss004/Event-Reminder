@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Event Reminder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#F5F6F8; --bg-elev:#FFFFFF; --bg-sunken:#ECEEF1;
+    --text:#1B2430; --text-muted:#5C6773; --border:#DDE1E6;
+    --accent:#146C5C; --accent-hover:#0F5449; --accent-soft:#E4F2EE; --accent-text:#0B4A3F;
+    --warn:#B96A17; --warn-soft:#FBF0E1;
+    --danger:#B23A2E; --danger-soft:#FBEAE7;
+    --success:#1F8A5B; --success-soft:#E6F5EC;
+    --shadow:0 1px 2px rgba(15,23,33,.06), 0 6px 16px rgba(15,23,33,.05);
+    --radius:10px;
+    --font-body:'Inter',system-ui,-apple-system,"Segoe UI",sans-serif;
+    --font-display:'Fraunces',Georgia,'Times New Roman',serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12161C; --bg-elev:#1A1F27; --bg-sunken:#0E1116;
+      --text:#E7EAEE; --text-muted:#95A0AB; --border:#2A313B;
+      --accent:#33C2A0; --accent-hover:#4CDBB8; --accent-soft:#16332D; --accent-text:#7CE8CB;
+      --warn:#E3A857; --warn-soft:#33260F;
+      --danger:#E5695A; --danger-soft:#391D19;
+      --success:#3FBE83; --success-soft:#12301F;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 24px rgba(0,0,0,.35);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12161C; --bg-elev:#1A1F27; --bg-sunken:#0E1116;
+    --text:#E7EAEE; --text-muted:#95A0AB; --border:#2A313B;
+    --accent:#33C2A0; --accent-hover:#4CDBB8; --accent-soft:#16332D; --accent-text:#7CE8CB;
+    --warn:#E3A857; --warn-soft:#33260F;
+    --danger:#E5695A; --danger-soft:#391D19;
+    --success:#3FBE83; --success-soft:#12301F;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 24px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--text); font-family:var(--font-body);
+    min-height:100vh; -webkit-font-smoothing:antialiased;
+  }
+  #root{max-width:920px; margin:0 auto; padding:0 16px 60px;}
+  a{color:var(--accent);}
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    display:flex; align-items:center; gap:12px; padding:18px 0 14px;
+    flex-wrap:wrap; border-bottom:1px solid var(--border); margin-bottom:20px;
+  }
+  .brand{display:flex; align-items:baseline; gap:8px; flex:1; min-width:180px;}
+  .brand h1{
+    font-family:var(--font-display); font-weight:600; font-size:1.5rem; margin:0;
+    letter-spacing:-0.01em;
+  }
+  .brand .bell{font-size:1.25rem;}
+  .topbar .controls{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  select, input, textarea{
+    font-family:var(--font-body); font-size:0.9rem; color:var(--text);
+    background:var(--bg-elev); border:1px solid var(--border); border-radius:8px;
+    padding:8px 10px; outline:none;
+  }
+  select:focus, input:focus, textarea:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);}
+  button{
+    font-family:var(--font-body); font-size:0.9rem; font-weight:600; cursor:pointer;
+    border-radius:8px; border:1px solid transparent; padding:8px 14px;
+    background:var(--bg-sunken); color:var(--text); transition:transform .05s ease;
+  }
+  button:active{transform:translateY(1px);}
+  button:focus-visible, select:focus-visible, input:focus-visible, a:focus-visible{
+    outline:2px solid var(--accent); outline-offset:2px;
+  }
+  .btn-primary{background:var(--accent); color:#fff;}
+  .btn-primary:hover{background:var(--accent-hover);}
+  .btn-ghost{background:transparent; border:1px solid var(--border);}
+  .btn-ghost:hover{background:var(--bg-sunken);}
+  .btn-danger{background:var(--danger-soft); color:var(--danger);}
+  .btn-danger:hover{filter:brightness(0.95);}
+  .btn-small{padding:5px 10px; font-size:0.8rem;}
+  .icon-btn{background:none; border:none; padding:4px 8px; font-size:0.95rem;}
+
+  /* ---------- Auth screen ---------- */
+  .auth-wrap{display:flex; justify-content:center; padding:40px 0;}
+  .auth-card{
+    width:100%; max-width:360px; background:var(--bg-elev); border:1px solid var(--border);
+    border-radius:var(--radius); padding:28px; box-shadow:var(--shadow);
+  }
+  .auth-card h2{font-family:var(--font-display); font-size:1.35rem; margin:0 0 4px;}
+  .auth-sub{color:var(--text-muted); font-size:0.85rem; margin:0 0 20px;}
+  .tabs{display:flex; gap:4px; background:var(--bg-sunken); padding:4px; border-radius:8px; margin-bottom:18px;}
+  .tabs button{flex:1; background:transparent; padding:7px 0; font-size:0.85rem;}
+  .tabs button.active{background:var(--bg-elev); box-shadow:var(--shadow);}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:0.82rem; color:var(--text-muted); margin-bottom:5px;}
+  .field input, .field select{width:100%;}
+  .auth-card .btn-primary{width:100%; padding:10px; margin-top:4px;}
+  .auth-msg{font-size:0.82rem; margin-top:10px; padding:8px 10px; border-radius:8px;}
+  .auth-msg.err{background:var(--danger-soft); color:var(--danger);}
+  .auth-msg.ok{background:var(--success-soft); color:var(--success);}
+  .lang-row{display:flex; justify-content:center; margin-bottom:18px;}
+
+  /* ---------- Stats strip ---------- */
+  .stats{display:flex; gap:0; margin:18px 0 22px; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:var(--bg-elev);}
+  .stat{flex:1; padding:14px 16px; text-align:left;}
+  .stat + .stat{border-left:1px solid var(--border);}
+  .stat .num{font-family:var(--font-display); font-size:1.7rem; font-weight:600; display:block; line-height:1.1;}
+  .stat .lbl{font-size:0.78rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.03em;}
+  .stat.pending .num{color:var(--warn);}
+  .stat.completed .num{color:var(--success);}
+
+  /* ---------- Toolbar ---------- */
+  .toolbar{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:16px;}
+  .toolbar input[type="search"]{flex:1; min-width:180px;}
+  .banner{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--accent-soft); color:var(--accent-text); border-radius:var(--radius);
+    padding:10px 14px; margin-bottom:16px; font-size:0.85rem;
+  }
+
+  /* ---------- Form card ---------- */
+  .card{background:var(--bg-elev); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:22px; box-shadow:var(--shadow);}
+  .card h3{margin:0 0 14px; font-family:var(--font-display); font-size:1.05rem; font-weight:600;}
+  .form-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px 14px;}
+  .form-grid .full{grid-column:1 / -1;}
+  @media (max-width:560px){ .form-grid{grid-template-columns:1fr;} }
+  .form-actions{display:flex; gap:10px; margin-top:16px;}
+
+  /* ---------- Event list ---------- */
+  .section-title{
+    font-size:0.78rem; text-transform:uppercase; letter-spacing:.04em; color:var(--text-muted);
+    margin:20px 0 8px; display:flex; align-items:center; gap:8px;
+  }
+  .section-title .dot{width:7px; height:7px; border-radius:50%;}
+  .dot.overdue{background:var(--danger);} .dot.today{background:var(--warn);}
+  .dot.upcoming{background:var(--accent);} .dot.done{background:var(--success);}
+  .event-row{
+    display:flex; align-items:center; gap:12px; background:var(--bg-elev); border:1px solid var(--border);
+    border-left:3px solid var(--border); border-radius:8px; padding:11px 14px; margin-bottom:8px; flex-wrap:wrap;
+  }
+  .event-row.overdue{border-left-color:var(--danger);}
+  .event-row.today{border-left-color:var(--warn);}
+  .event-row.upcoming{border-left-color:var(--accent);}
+  .event-row.done{border-left-color:var(--success); opacity:0.75;}
+  .event-main{flex:1; min-width:160px;}
+  .event-main .name{font-weight:600; font-size:0.95rem;}
+  .event-main .meta{font-size:0.8rem; color:var(--text-muted); margin-top:2px;}
+  .event-main .note{font-size:0.8rem; color:var(--text-muted); font-style:italic; margin-top:2px;}
+  .event-actions{display:flex; gap:6px; flex-wrap:wrap;}
+  .empty-state{color:var(--text-muted); font-size:0.88rem; padding:18px 4px;}
+
+  /* ---------- Modal ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(10,13,17,.5); display:none;
+    align-items:center; justify-content:center; padding:20px; z-index:50;
+  }
+  .overlay.open{display:flex;}
+  .modal{
+    background:var(--bg-elev); border-radius:var(--radius); border:1px solid var(--border);
+    max-width:480px; width:100%; max-height:85vh; overflow-y:auto; padding:22px; box-shadow:var(--shadow);
+  }
+  .modal h3{font-family:var(--font-display); margin:0 0 14px;}
+  .modal .row{display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:0.9rem;}
+  .modal .row:last-child{border-bottom:none;}
+  .modal-close{display:flex; justify-content:flex-end; margin-top:16px;}
+  .about-body{white-space:pre-line; font-size:0.9rem; line-height:1.6; color:var(--text-muted);}
+  canvas{max-width:100%;}
+
+  /* ---------- Toasts ---------- */
+  #toasts{position:fixed; bottom:18px; right:18px; display:flex; flex-direction:column; gap:10px; z-index:80; max-width:320px;}
+  .toast{
+    background:var(--bg-elev); border:1px solid var(--border); border-left:3px solid var(--accent);
+    border-radius:8px; padding:12px 14px; box-shadow:var(--shadow); font-size:0.85rem;
+  }
+  .toast .t-actions{margin-top:8px; display:flex; gap:8px;}
+  footer.hint{color:var(--text-muted); font-size:0.78rem; text-align:center; margin-top:30px;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="toasts"></div>
+
+<script>
+/* ============================= i18n ============================= */
+const LANG = {
+  English: {
+    login:"Login", register:"Register", username:"Username", password:"Password", confirmPassword:"Confirm password",
+    loginBtn:"Log in", registerBtn:"Create account",
+    fillAllFields:"Please fill in all fields.", invalidCreds:"Incorrect username or password.",
+    welcomeBack:"Welcome back, {u}!", regSuccess:"Account created — you can log in now.",
+    userExists:"That username is already taken.", pwMismatch:"Passwords do not match.",
+    language:"Language", theme:"Theme", logout:"Log out", greeting:"Hi, {u}",
+    themeLight:"Light", themeDark:"Dark", themeSystem:"Auto",
+    statsTotal:"Total", statsCompleted:"Completed", statsPending:"Pending",
+    searchPlaceholder:"Search by name or date…",
+    enableNotifText:"Turn on notifications and voice reminders for events that are due.",
+    enableNotifBtn:"Enable reminders", dismiss:"Dismiss",
+    formTitleAdd:"Add an event", formTitleEdit:"Edit event",
+    formName:"Event name", formDate:"Date", formTime:"Time",
+    formPhone:"Phone (with country code)", formNote:"Note",
+    addBtn:"Add event", saveBtn:"Save changes", clearBtn:"Clear",
+    requiredError:"Please enter event name, date and time.",
+    sectionOverdue:"Overdue", sectionToday:"Today", sectionUpcoming:"Upcoming", sectionDone:"Completed",
+    emptyState:"No events yet — add your first one above.",
+    noSearchResults:"No events match your search.",
+    mark:"Done", edit:"Edit", del:"Delete",
+    confirmDelete:'Delete "{n}"?', yes:"Yes", cancel:"Cancel",
+    weeklyGraphBtn:"Weekly graph", overviewBtn:"Overview", aboutBtn:"About", close:"Close",
+    overviewTitle:"Event overview",
+    chartTitle:"Completed events this week",
+    aboutTitle:"About",
+    aboutBody:"Event Reminder App\nTeam Lead:\nOm A. Singh\n1. Aryan Gharat\n2. Rohan Sarkate\n3. Umar Patel\n4. Shriven Muley\n5. Atul Bawaskar\nWeb Edition",
+    reminderPrefix:"Reminder:", reminderSuffix:"is now.",
+    sendWhatsapp:"Send WhatsApp reminder",
+  },
+  Hindi: {
+    login:"लॉगिन", register:"रजिस्टर करें", username:"उपयोगकर्ता नाम", password:"पासवर्ड", confirmPassword:"पासवर्ड की पुष्टि करें",
+    loginBtn:"लॉगिन करें", registerBtn:"खाता बनाएं",
+    fillAllFields:"कृपया सभी फ़ील्ड भरें।", invalidCreds:"उपयोगकर्ता नाम या पासवर्ड गलत है।",
+    welcomeBack:"स्वागत है, {u}!", regSuccess:"खाता बन गया — अब आप लॉगिन कर सकते हैं।",
+    userExists:"यह नाम पहले से मौजूद है।", pwMismatch:"पासवर्ड मेल नहीं खाते।",
+    language:"भाषा", theme:"थीम", logout:"लॉगआउट", greeting:"नमस्ते, {u}",
+    themeLight:"लाइट", themeDark:"डार्क", themeSystem:"ऑटो",
+    statsTotal:"कुल", statsCompleted:"पूर्ण", statsPending:"बाकी",
+    searchPlaceholder:"नाम या तारीख से खोजें…",
+    enableNotifText:"समय पर होने वाले इवेंट्स के लिए नोटिफिकेशन और आवाज़ रिमाइंडर चालू करें।",
+    enableNotifBtn:"रिमाइंडर चालू करें", dismiss:"बंद करें",
+    formTitleAdd:"इवेंट जोड़ें", formTitleEdit:"इवेंट संपादित करें",
+    formName:"इवेंट का नाम", formDate:"तारीख", formTime:"समय",
+    formPhone:"फ़ोन (कंट्री कोड सहित)", formNote:"नोट",
+    addBtn:"इवेंट जोड़ें", saveBtn:"बदलाव सहेजें", clearBtn:"साफ़ करें",
+    requiredError:"कृपया इवेंट का नाम, तारीख और समय दर्ज करें।",
+    sectionOverdue:"समय निकल गया", sectionToday:"आज", sectionUpcoming:"आने वाले", sectionDone:"पूर्ण",
+    emptyState:"अभी कोई इवेंट नहीं है — ऊपर पहला इवेंट जोड़ें।",
+    noSearchResults:"आपकी खोज से कोई इवेंट नहीं मिला।",
+    mark:"पूर्ण", edit:"संपादित करें", del:"हटाएं",
+    confirmDelete:'"{n}" को हटाएं?', yes:"हाँ", cancel:"रद्द करें",
+    weeklyGraphBtn:"साप्ताहिक ग्राफ़", overviewBtn:"अवलोकन", aboutBtn:"बारे में", close:"बंद करें",
+    overviewTitle:"इवेंट अवलोकन",
+    chartTitle:"इस सप्ताह पूर्ण हुए इवेंट्स",
+    aboutTitle:"बारे में",
+    aboutBody:"इवेंट रिमाइंडर ऐप\nटीम लीड:\nओम ए. सिंह\n1. आर्यन घरात\n2. रोहन सरकाटे\n3. उमर पटेल\n4. श्रीवेन मुले\n5. अतुल बावस्कर\nवेब एडिशन",
+    reminderPrefix:"रिमाइंडर:", reminderSuffix:"अभी है।",
+    sendWhatsapp:"WhatsApp रिमाइंडर भेजें",
+  },
+  Marathi: {
+    login:"लॉगिन", register:"नोंदणी करा", username:"वापरकर्ता नाव", password:"पासवर्ड", confirmPassword:"पासवर्ड पडताळा",
+    loginBtn:"लॉगिन करा", registerBtn:"खाते तयार करा",
+    fillAllFields:"कृपया सर्व रकाने भरा.", invalidCreds:"वापरकर्ता नाव किंवा पासवर्ड चुकीचा आहे.",
+    welcomeBack:"पुन्हा स्वागत आहे, {u}!", regSuccess:"खाते तयार झाले — आता तुम्ही लॉगिन करू शकता.",
+    userExists:"हे नाव आधीपासूनच अस्तित्वात आहे.", pwMismatch:"पासवर्ड जुळत नाहीत.",
+    language:"भाषा", theme:"थीम", logout:"लॉगआऊट", greeting:"नमस्कार, {u}",
+    themeLight:"लाइट", themeDark:"डार्क", themeSystem:"ऑटो",
+    statsTotal:"एकूण", statsCompleted:"पूर्ण", statsPending:"बाकी",
+    searchPlaceholder:"नाव किंवा तारखेने शोधा…",
+    enableNotifText:"वेळेवर असलेल्या इव्हेंट्ससाठी सूचना आणि आवाज रिमाइंडर सुरू करा.",
+    enableNotifBtn:"रिमाइंडर सुरू करा", dismiss:"बंद करा",
+    formTitleAdd:"इव्हेंट जोडा", formTitleEdit:"इव्हेंट संपादित करा",
+    formName:"इव्हेंटचे नाव", formDate:"तारीख", formTime:"वेळ",
+    formPhone:"फोन (कंट्री कोडसह)", formNote:"टीप",
+    addBtn:"इव्हेंट जोडा", saveBtn:"बदल जतन करा", clearBtn:"साफ करा",
+    requiredError:"कृपया इव्हेंटचे नाव, तारीख आणि वेळ भरा.",
+    sectionOverdue:"वेळ निघून गेली", sectionToday:"आज", sectionUpcoming:"पुढील", sectionDone:"पूर्ण",
+    emptyState:"अजून कोणताही इव्हेंट नाही — वर पहिला इव्हेंट जोडा.",
+    noSearchResults:"तुमच्या शोधाशी जुळणारा इव्हेंट सापडला नाही.",
+    mark:"पूर्ण", edit:"संपादित करा", del:"काढा",
+    confirmDelete:'"{n}" काढायचे?', yes:"होय", cancel:"रद्द करा",
+    weeklyGraphBtn:"साप्ताहिक आलेख", overviewBtn:"आढावा", aboutBtn:"विषयी", close:"बंद करा",
+    overviewTitle:"इव्हेंट आढावा",
+    chartTitle:"या आठवड्यात पूर्ण झालेले इव्हेंट्स",
+    aboutTitle:"विषयी",
+    aboutBody:"इव्हेंट रिमाइंडर अ‍ॅप\nटीम लीड:\nओम ए. सिंग\n1. आर्यन घरात\n2. रोहन सरकाटे\n3. उमर पटेल\n4. श्रीवेन मुळे\n5. अतुल बावस्कर\nवेब एडिशन",
+    reminderPrefix:"रिमाइंडर:", reminderSuffix:"आता आहे.",
+    sendWhatsapp:"WhatsApp रिमाइंडर पाठवा",
+  }
+};
+function t(key, vars){
+  let s = (LANG[state.lang] && LANG[state.lang][key]) || LANG.English[key] || key;
+  if(vars) for(const k in vars) s = s.replace('{'+k+'}', vars[k]);
+  return s;
+}
+
+/* ============================= storage ============================= */
+const LS_USERS = 'er.users';
+const LS_SESSION = 'er.session';
+const LS_LANG = 'er.lang';
+const LS_THEME = 'er.theme';
+function evKey(u){ return 'er.events.' + u; }
+
+function safeGet(key, fallback){
+  try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch(e){ return fallback; }
+}
+function safeSet(key, val){
+  try{ localStorage.setItem(key, JSON.stringify(val)); return true; }
+  catch(e){ console.error('Storage error', e); return false; }
+}
+function loadUsers(){ return safeGet(LS_USERS, {}); }
+function saveUsers(u){ safeSet(LS_USERS, u); }
+function loadEvents(username){ return safeGet(evKey(username), []); }
+function saveEvents(username, events){ safeSet(evKey(username), events); }
+
+async function hashPw(pw){
+  try{
+    const enc = new TextEncoder().encode(pw);
+    const buf = await crypto.subtle.digest('SHA-256', enc);
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }catch(e){ return btoa(unescape(encodeURIComponent(pw))); }
+}
+
+/* ============================= state ============================= */
+const state = {
+  user: safeGet(LS_SESSION, null),
+  lang: safeGet(LS_LANG, 'English'),
+  theme: safeGet(LS_THEME, 'system'),
+  authMode: 'login',
+  authMsg: null,
+  events: [],
+  editingId: null,
+  search: '',
+  notifOn: false,
+  notifDismissed: safeGet('er.notifDismissed', false),
+};
+if(state.user){ state.events = loadEvents(state.user); }
+applyTheme();
+
+function applyTheme(){
+  const root = document.documentElement;
+  if(state.theme === 'light') root.setAttribute('data-theme','light');
+  else if(state.theme === 'dark') root.setAttribute('data-theme','dark');
+  else root.removeAttribute('data-theme');
+}
+
+/* ============================= toasts ============================= */
+function showToast(html, timeout){
+  const wrap = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerHTML = html;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.remove(); }, timeout || 9000);
+}
+
+/* ============================= reminder engine ============================= */
+function speak(text){
+  try{
+    if('speechSynthesis' in window){
+      const u = new SpeechSynthesisUtterance(text);
+      window.speechSynthesis.speak(u);
+    }
+  }catch(e){ console.error('speech error', e); }
+}
+function notifyOS(title, body){
+  try{
+    if('Notification' in window && Notification.permission === 'granted'){
+      new Notification(title, { body });
+    }
+  }catch(e){ console.error('notification error', e); }
+}
+function waLink(phone, message){
+  const digits = (phone||'').replace(/[^\d]/g,'');
+  return 'https://wa.me/' + digits + '?text=' + encodeURIComponent(message);
+}
+function sendWhatsappAuto(phone, message){
+  // Tries the backend API route (only exists when this app is deployed with the
+  // Twilio backend, e.g. on Vercel). On the Claude-hosted preview link there is
+  // no backend, so this will fail and we fall back to the manual wa.me link.
+  return fetch('api/send-whatsapp', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ to: phone, message })
+  }).then(r=>{ if(!r.ok) throw new Error('backend responded with error'); return true; })
+    .catch(()=> false);
+}
+function checkReminders(){
+  if(!state.user) return;
+  const now = new Date();
+  let changed = false;
+  state.events.forEach(e=>{
+    if(e.done) return;
+    const dt = new Date(e.date + 'T' + (e.time||'00:00'));
+    if(isNaN(dt)) return;
+    const diffMs = dt - now;
+    if(diffMs <= 0 && diffMs > -60000){
+      const msg = `${t('reminderPrefix')} ${e.name} ${t('reminderSuffix')}`;
+      speak(msg);
+      notifyOS('Event Reminder', msg);
+      if(e.phone){
+        sendWhatsappAuto(e.phone, msg).then(sent=>{
+          if(sent){
+            showToast(`<strong>${esc(msg)}</strong><div class="t-actions" style="color:var(--success);">✓ ${t('sendWhatsapp')}</div>`, 8000);
+          } else {
+            const extra = `<div class="t-actions"><a class="btn-small btn-primary" style="text-decoration:none;padding:5px 10px;border-radius:8px;" target="_blank" rel="noopener" href="${waLink(e.phone, msg)}">${t('sendWhatsapp')}</a></div>`;
+            showToast(`<strong>${esc(msg)}</strong>${extra}`, 15000);
+          }
+        });
+      } else {
+        showToast(`<strong>${esc(msg)}</strong>`, 15000);
+      }
+      e.done = true;
+      changed = true;
+    }
+  });
+  if(changed){ saveEvents(state.user, state.events); render(); }
+}
+setInterval(checkReminders, 30000);
+
+/* ============================= actions ============================= */
+async function handleLogin(username, password){
+  username = username.trim(); password = password.trim();
+  if(!username || !password){ state.authMsg = {type:'err', text:t('fillAllFields')}; return render(); }
+  const users = loadUsers();
+  const hp = await hashPw(password);
+  if(users[username] && users[username] === hp){
+    state.user = username;
+    state.events = loadEvents(username);
+    safeSet(LS_SESSION, username);
+    state.authMsg = null;
+    render();
+  } else {
+    state.authMsg = {type:'err', text:t('invalidCreds')};
+    render();
+  }
+}
+async function handleRegister(username, password, confirm){
+  username = username.trim(); password = password.trim(); confirm = confirm.trim();
+  if(!username || !password || !confirm){ state.authMsg = {type:'err', text:t('fillAllFields')}; return render(); }
+  if(password !== confirm){ state.authMsg = {type:'err', text:t('pwMismatch')}; return render(); }
+  const users = loadUsers();
+  if(users[username]){ state.authMsg = {type:'err', text:t('userExists')}; return render(); }
+  users[username] = await hashPw(password);
+  saveUsers(users);
+  state.authMode = 'login';
+  state.authMsg = {type:'ok', text:t('regSuccess')};
+  render();
+}
+function handleLogout(){
+  state.user = null; state.events = []; state.editingId = null; state.search = '';
+  localStorage.removeItem(LS_SESSION);
+  render();
+}
+function addOrUpdateEvent(data){
+  if(!data.name || !data.date || !data.time){
+    showToast(t('requiredError'));
+    return;
+  }
+  if(state.editingId){
+    const idx = state.events.findIndex(e=>e.id === state.editingId);
+    if(idx >= 0) state.events[idx] = {...state.events[idx], ...data};
+    state.editingId = null;
+  } else {
+    state.events.push({ id: Date.now().toString(36)+Math.random().toString(36).slice(2,7), done:false, ...data });
+  }
+  saveEvents(state.user, state.events);
+  render();
+}
+function deleteEvent(id){
+  const ev = state.events.find(e=>e.id===id);
+  if(!ev) return;
+  if(!confirm(t('confirmDelete',{n:ev.name}))) return;
+  state.events = state.events.filter(e=>e.id!==id);
+  saveEvents(state.user, state.events);
+  render();
+}
+function markDone(id){
+  const ev = state.events.find(e=>e.id===id);
+  if(ev){ ev.done = true; saveEvents(state.user, state.events); render(); }
+}
+function startEdit(id){
+  state.editingId = id;
+  render();
+  const el = document.getElementById('formCard');
+  if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+function clearForm(){ state.editingId = null; render(); }
+function enableReminders(){
+  try{
+    if('Notification' in window && Notification.requestPermission){
+      Notification.requestPermission().then(()=>{ render(); });
+    }
+  }catch(e){}
+  state.notifOn = true;
+  render();
+  showToast(t('enableNotifBtn') + ' ✓');
+}
+function dismissNotifBanner(){
+  state.notifDismissed = true;
+  safeSet('er.notifDismissed', true);
+  render();
+}
+
+/* ============================= grouping ============================= */
+function groupEvents(){
+  const now = new Date();
+  const todayStr = now.toISOString().slice(0,10);
+  const q = state.search.trim().toLowerCase();
+  const filtered = state.events.filter(e=>{
+    if(!q) return true;
+    return e.name.toLowerCase().includes(q) || e.date.includes(q);
+  });
+  const groups = { overdue:[], today:[], upcoming:[], done:[] };
+  filtered.forEach(e=>{
+    if(e.done){ groups.done.push(e); return; }
+    const dt = new Date(e.date + 'T' + (e.time||'00:00'));
+    if(dt < now) groups.overdue.push(e);
+    else if(e.date === todayStr) groups.today.push(e);
+    else groups.upcoming.push(e);
+  });
+  groups.overdue.sort((a,b)=> (a.date+a.time).localeCompare(b.date+b.time));
+  groups.today.sort((a,b)=> (a.date+a.time).localeCompare(b.date+b.time));
+  groups.upcoming.sort((a,b)=> (a.date+a.time).localeCompare(b.date+b.time));
+  groups.done.sort((a,b)=> (b.date+b.time).localeCompare(a.date+a.time));
+  return {groups, total: filtered.length};
+}
+
+/* ============================= rendering ============================= */
+function esc(s){ return (s||'').toString().replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function renderLangSelect(id){
+  return `<select id="${id}" onchange="state.lang=this.value; safeSet(LS_LANG,this.value); render();">
+    ${Object.keys(LANG).map(l=>`<option value="${l}" ${state.lang===l?'selected':''}>${l}</option>`).join('')}
+  </select>`;
+}
+function renderThemeSelect(){
+  return `<select onchange="state.theme=this.value; safeSet(LS_THEME,this.value); applyTheme();">
+    <option value="system" ${state.theme==='system'?'selected':''}>${t('themeSystem')}</option>
+    <option value="light" ${state.theme==='light'?'selected':''}>${t('themeLight')}</option>
+    <option value="dark" ${state.theme==='dark'?'selected':''}>${t('themeDark')}</option>
+  </select>`;
+}
+
+function renderAuth(){
+  const isLogin = state.authMode === 'login';
+  return `
+  <div class="topbar">
+    <div class="brand"><span class="bell">🔔</span><h1>Event Reminder</h1></div>
+    <div class="controls">${renderThemeSelect()}</div>
+  </div>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="lang-row">${renderLangSelect('authLang')}</div>
+      <div class="tabs">
+        <button class="${isLogin?'active':''}" onclick="state.authMode='login'; state.authMsg=null; render();">${t('login')}</button>
+        <button class="${!isLogin?'active':''}" onclick="state.authMode='register'; state.authMsg=null; render();">${t('register')}</button>
+      </div>
+      <h2>${isLogin ? t('login') : t('register')}</h2>
+      <p class="auth-sub">${isLogin ? '' : ''}</p>
+      <div class="field"><label>${t('username')}</label><input id="f_user" type="text" autocomplete="username"/></div>
+      <div class="field"><label>${t('password')}</label><input id="f_pass" type="password" autocomplete="${isLogin?'current-password':'new-password'}"/></div>
+      ${isLogin ? '' : `<div class="field"><label>${t('confirmPassword')}</label><input id="f_conf" type="password"/></div>`}
+      <button class="btn-primary" onclick="${isLogin?'submitLogin()':'submitRegister()'}">${isLogin ? t('loginBtn') : t('registerBtn')}</button>
+      ${state.authMsg ? `<div class="auth-msg ${state.authMsg.type==='err'?'err':'ok'}">${esc(state.authMsg.text)}</div>` : ''}
+    </div>
+  </div>
+  <footer class="hint">Data is stored privately in this browser only.</footer>
+  `;
+}
+function submitLogin(){ handleLogin(document.getElementById('f_user').value, document.getElementById('f_pass').value); }
+function submitRegister(){ handleRegister(document.getElementById('f_user').value, document.getElementById('f_pass').value, document.getElementById('f_conf').value); }
+
+function eventRow(e, kind){
+  return `
+  <div class="event-row ${kind}">
+    <div class="event-main">
+      <div class="name">${esc(e.name)}</div>
+      <div class="meta">${esc(e.date)} · ${esc(e.time)}${e.phone ? ' · '+esc(e.phone) : ''}</div>
+      ${e.note ? `<div class="note">${esc(e.note)}</div>` : ''}
+    </div>
+    <div class="event-actions">
+      ${!e.done ? `<button class="btn-small btn-ghost" onclick="markDone('${e.id}')">${t('mark')}</button>` : ''}
+      <button class="btn-small btn-ghost" onclick="startEdit('${e.id}')">${t('edit')}</button>
+      <button class="btn-small btn-danger" onclick="deleteEvent('${e.id}')">${t('del')}</button>
+    </div>
+  </div>`;
+}
+function section(title, dotClass, list, kind){
+  if(list.length === 0) return '';
+  return `<div class="section-title"><span class="dot ${dotClass}"></span>${title} (${list.length})</div>` +
+    list.map(e=>eventRow(e,kind)).join('');
+}
+
+function renderApp(){
+  const { groups, total } = groupEvents();
+  const completed = state.events.filter(e=>e.done).length;
+  const pending = state.events.length - completed;
+  const editing = state.editingId ? state.events.find(e=>e.id===state.editingId) : null;
+
+  const notifBanner = (!state.notifDismissed && !state.notifOn) ? `
+  <div class="banner">
+    <span>🔔 ${t('enableNotifText')}</span>
+    <span style="display:flex;gap:8px;">
+      <button class="btn-small btn-primary" onclick="enableReminders()">${t('enableNotifBtn')}</button>
+      <button class="btn-small btn-ghost" onclick="dismissNotifBanner()">${t('dismiss')}</button>
+    </span>
+  </div>` : '';
+
+  let listHtml;
+  if(state.events.length === 0){
+    listHtml = `<div class="empty-state">${t('emptyState')}</div>`;
+  } else if(total === 0){
+    listHtml = `<div class="empty-state">${t('noSearchResults')}</div>`;
+  } else {
+    listHtml = section(t('sectionOverdue'),'overdue',groups.overdue,'overdue')
+      + section(t('sectionToday'),'today',groups.today,'today')
+      + section(t('sectionUpcoming'),'upcoming',groups.upcoming,'upcoming')
+      + section(t('sectionDone'),'done',groups.done,'done');
+  }
+
+  return `
+  <div class="topbar">
+    <div class="brand"><span class="bell">🔔</span><h1>Event Reminder</h1></div>
+    <div class="controls">
+      <span style="color:var(--text-muted);font-size:.85rem;">${t('greeting',{u:esc(state.user)})}</span>
+      ${renderLangSelect('appLang')}
+      ${renderThemeSelect()}
+      <button class="btn-ghost btn-small" onclick="handleLogout()">${t('logout')}</button>
+    </div>
+  </div>
+
+  ${notifBanner}
+
+  <div class="stats">
+    <div class="stat"><span class="num">${state.events.length}</span><span class="lbl">${t('statsTotal')}</span></div>
+    <div class="stat completed"><span class="num">${completed}</span><span class="lbl">${t('statsCompleted')}</span></div>
+    <div class="stat pending"><span class="num">${pending}</span><span class="lbl">${t('statsPending')}</span></div>
+  </div>
+
+  <div class="toolbar">
+    <input type="search" placeholder="${t('searchPlaceholder')}" value="${esc(state.search)}" oninput="state.search=this.value; renderListOnly();"/>
+    <button class="btn-ghost" onclick="openGraphModal()">${t('weeklyGraphBtn')}</button>
+    <button class="btn-ghost" onclick="openModal('overviewModal')">${t('overviewBtn')}</button>
+    <button class="btn-ghost" onclick="openModal('aboutModal')">${t('aboutBtn')}</button>
+  </div>
+
+  <div class="card" id="formCard">
+    <h3>${editing ? t('formTitleEdit') : t('formTitleAdd')}</h3>
+    <div class="form-grid">
+      <div class="field full"><label>${t('formName')}</label><input id="in_name" type="text" value="${esc(editing?.name)}"/></div>
+      <div class="field"><label>${t('formDate')}</label><input id="in_date" type="date" value="${esc(editing?.date)}"/></div>
+      <div class="field"><label>${t('formTime')}</label><input id="in_time" type="time" value="${esc(editing?.time)}"/></div>
+      <div class="field"><label>${t('formPhone')}</label><input id="in_phone" type="tel" placeholder="+91XXXXXXXXXX" value="${esc(editing?.phone)}"/></div>
+      <div class="field full"><label>${t('formNote')}</label><input id="in_note" type="text" value="${esc(editing?.note)}"/></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-primary" onclick="submitEventForm()">${editing ? t('saveBtn') : t('addBtn')}</button>
+      <button class="btn-ghost" onclick="clearForm()">${t('clearBtn')}</button>
+    </div>
+  </div>
+
+  <div id="listWrap">${listHtml}</div>
+
+  <footer class="hint">Data is stored privately in this browser only, under your account.</footer>
+  `;
+}
+function submitEventForm(){
+  const data = {
+    name: document.getElementById('in_name').value.trim(),
+    date: document.getElementById('in_date').value,
+    time: document.getElementById('in_time').value,
+    phone: document.getElementById('in_phone').value.trim(),
+    note: document.getElementById('in_note').value.trim(),
+  };
+  addOrUpdateEvent(data);
+}
+function renderListOnly(){
+  const { groups, total } = groupEvents();
+  let listHtml;
+  if(state.events.length === 0) listHtml = `<div class="empty-state">${t('emptyState')}</div>`;
+  else if(total === 0) listHtml = `<div class="empty-state">${t('noSearchResults')}</div>`;
+  else listHtml = section(t('sectionOverdue'),'overdue',groups.overdue,'overdue')
+      + section(t('sectionToday'),'today',groups.today,'today')
+      + section(t('sectionUpcoming'),'upcoming',groups.upcoming,'upcoming')
+      + section(t('sectionDone'),'done',groups.done,'done');
+  document.getElementById('listWrap').innerHTML = listHtml;
+}
+
+/* ============================= modals ============================= */
+function ensureModals(){
+  if(document.getElementById('overviewModal')) return;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `
+  <div class="overlay" id="overviewModal">
+    <div class="modal">
+      <h3 id="overviewTitleEl"></h3>
+      <div id="overviewBody"></div>
+      <div class="modal-close"><button class="btn-ghost" onclick="closeModal('overviewModal')"></button></div>
+    </div>
+  </div>
+  <div class="overlay" id="aboutModal">
+    <div class="modal">
+      <h3 id="aboutTitleEl"></h3>
+      <div class="about-body" id="aboutBody"></div>
+      <div class="modal-close"><button class="btn-ghost" onclick="closeModal('aboutModal')"></button></div>
+    </div>
+  </div>
+  <div class="overlay" id="graphModal">
+    <div class="modal">
+      <h3 id="graphTitleEl"></h3>
+      <canvas id="weeklyChart" height="220"></canvas>
+      <div class="modal-close"><button class="btn-ghost" onclick="closeModal('graphModal')"></button></div>
+    </div>
+  </div>`;
+  document.body.appendChild(wrap);
+}
+function openModal(id){
+  ensureModals();
+  if(id === 'overviewModal'){
+    const completed = state.events.filter(e=>e.done).length;
+    const pending = state.events.length - completed;
+    document.getElementById('overviewTitleEl').textContent = t('overviewTitle');
+    document.getElementById('overviewBody').innerHTML = `
+      <div class="row"><span>${t('statsTotal')}</span><strong>${state.events.length}</strong></div>
+      <div class="row"><span>${t('statsCompleted')}</span><strong>${completed}</strong></div>
+      <div class="row"><span>${t('statsPending')}</span><strong>${pending}</strong></div>`;
+  }
+  if(id === 'aboutModal'){
+    document.getElementById('aboutTitleEl').textContent = t('aboutTitle');
+    document.getElementById('aboutBody').textContent = t('aboutBody');
+  }
+  document.querySelectorAll('.modal-close button').forEach(b=> b.textContent = t('close'));
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+let chartInstance = null;
+function openGraphModal(){
+  ensureModals();
+  document.getElementById('graphTitleEl').textContent = t('chartTitle');
+  document.getElementById('graphModal').classList.add('open');
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const now = new Date();
+  const startOfWeek = new Date(now); startOfWeek.setDate(now.getDate()-now.getDay()); startOfWeek.setHours(0,0,0,0);
+  const counts = [0,0,0,0,0,0,0];
+  state.events.forEach(e=>{
+    if(!e.done) return;
+    const d = new Date(e.date+'T00:00:00');
+    if(d >= startOfWeek && d < new Date(startOfWeek.getTime()+7*86400000)){
+      counts[d.getDay()]++;
+    }
+  });
+  const ctx = document.getElementById('weeklyChart').getContext('2d');
+  if(chartInstance) chartInstance.destroy();
+  const styles = getComputedStyle(document.documentElement);
+  chartInstance = new Chart(ctx, {
+    type:'bar',
+    data:{ labels: days, datasets:[{ label:t('chartTitle'), data:counts, backgroundColor: styles.getPropertyValue('--accent').trim() || '#146C5C', borderRadius:5 }]},
+    options:{ responsive:true, plugins:{legend:{display:false}}, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } } }
+  });
+}
+
+/* ============================= render root ============================= */
+function render(){
+  const root = document.getElementById('root');
+  root.innerHTML = state.user ? renderApp() : renderAuth();
+}
+render();
+checkReminders();
+</script>
+</body>
+</html>
