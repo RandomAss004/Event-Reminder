@@ -3,191 +3,173 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Popping Reminder</title>
+<title>Event Reminder — Web Edition</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Dancing+Script:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
-  :root{
-    --bg:#FBF6EA; --bg-elev:#FFFFFF; --bg-sunken:#F3EAD3;
-    --text:#241C10; --text-muted:#7A6B4E; --border:#E3D5AE;
-    --accent:#B8860B; --accent-hover:#9C7209; --accent-soft:#F6E9C4; --accent-text:#7A5B06;
-    --warn:#B9791D; --warn-soft:#FBF0DC;
-    --danger:#A1372B; --danger-soft:#FBE7E2;
-    --success:#2F7A50; --success-soft:#E4F2E9;
-    --shadow:0 1px 2px rgba(60,40,10,.08), 0 8px 20px rgba(60,40,10,.08);
-    --radius:10px;
-    --font-body:'Inter',system-ui,-apple-system,"Segoe UI",sans-serif;
-    --font-display:'Poppins',system-ui,-apple-system,"Segoe UI",sans-serif;
-    --font-script:'Dancing Script','Segoe Script',cursive;
+  :root {
+    --primary: #2563EB;
+    --primary-hover: #1D4ED8;
+    --primary-soft: #EFF6FF;
+    --primary-text: #1E40AF;
+    --bg: #F8FAFC;
+    --bg-elev: #FFFFFF;
+    --bg-sunken: #F1F5F9;
+    --text: #0F172A;
+    --text-muted: #64748B;
+    --border: #E2E8F0;
+    --danger: #EF4444;
+    --danger-soft: #FEE2E2;
+    --warning: #F59E0B;
+    --warning-soft: #FEF3C7;
+    --success: #10B981;
+    --success-soft: #D1FAE5;
+    --shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+    --radius: 10px;
+    --font: 'Inter', system-ui, -apple-system, sans-serif;
     color-scheme: light;
   }
-  @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
-      --bg:#0D0B08; --bg-elev:#17140F; --bg-sunken:#0A0908;
-      --text:#F2EAD9; --text-muted:#B9AF9C; --border:#3A2E1D;
-      --accent:#D4AF37; --accent-hover:#E9C767; --accent-soft:#2A2011; --accent-text:#F0D687;
-      --warn:#E0A93E; --warn-soft:#332208;
-      --danger:#C0584A; --danger-soft:#2A1512;
-      --success:#4C9A6A; --success-soft:#16281E;
-      --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px rgba(0,0,0,.5);
-      color-scheme: dark;
-    }
-  }
-  :root[data-theme="dark"]{
-    --bg:#0D0B08; --bg-elev:#17140F; --bg-sunken:#0A0908;
-    --text:#F2EAD9; --text-muted:#B9AF9C; --border:#3A2E1D;
-    --accent:#D4AF37; --accent-hover:#E9C767; --accent-soft:#2A2011; --accent-text:#F0D687;
-    --warn:#E0A93E; --warn-soft:#332208;
-    --danger:#C0584A; --danger-soft:#2A1512;
-    --success:#4C9A6A; --success-soft:#16281E;
-    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px rgba(0,0,0,.5);
+  [data-theme="dark"] {
+    --primary: #3B82F6;
+    --primary-hover: #60A5FA;
+    --primary-soft: #1E293B;
+    --primary-text: #93C5FD;
+    --bg: #0B1329;
+    --bg-elev: #111E38;
+    --bg-sunken: #0F172A;
+    --text: #F8FAFC;
+    --text-muted: #94A3B8;
+    --border: #1E293B;
+    --danger: #F87171;
+    --danger-soft: #450A0A;
+    --warning: #FBBF24;
+    --warning-soft: #451A03;
+    --success: #34D399;
+    --success-soft: #064E3B;
+    --shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
     color-scheme: dark;
   }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    background:var(--bg); color:var(--text); font-family:var(--font-body);
-    min-height:100vh; -webkit-font-smoothing:antialiased;
-  }
-  #root{max-width:920px; margin:0 auto; padding:0 16px 60px;}
-  a{color:var(--accent);}
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; }
+  #root { max-width: 1080px; margin: 0 auto; padding: 0 16px 60px; }
+  a { color: var(--primary); text-decoration: none; }
 
-  /* ---------- Top bar ---------- */
-  .topbar{
-    display:flex; align-items:center; gap:12px; padding:18px 0 14px;
-    flex-wrap:wrap; border-bottom:1px solid var(--border); margin-bottom:20px;
+  /* Header */
+  .header {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 16px 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; flex-wrap: wrap;
   }
-  .brand{display:flex; align-items:baseline; gap:10px; flex:1; min-width:180px; flex-wrap:wrap;}
-  .brand h1{
-    font-family:var(--font-display); font-weight:800; font-size:1.5rem; margin:0;
-    letter-spacing:-0.01em;
-    background:linear-gradient(135deg,#F5D57A 0%,#D4AF37 45%,#9C7209 100%);
-    -webkit-background-clip:text; background-clip:text; color:var(--accent);
-    -webkit-text-fill-color:transparent;
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand .logo { font-size: 1.8rem; }
+  .brand h1 {
+    font-size: 1.35rem; font-weight: 800; margin: 0;
+    background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
   }
-  .brand .tagline{font-family:var(--font-script); font-size:1.05rem; color:var(--accent); font-weight:600; margin-left:2px;}
-  .brand .crown{font-size:1.3rem;}
-  .topbar .controls{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
-  select, input, textarea{
-    font-family:var(--font-body); font-size:0.9rem; color:var(--text);
-    background:var(--bg-elev); border:1px solid var(--border); border-radius:8px;
-    padding:8px 10px; outline:none;
+  [data-theme="dark"] .brand h1 {
+    background: linear-gradient(135deg, #60A5FA 0%, #93C5FD 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
   }
-  select:focus, input:focus, textarea:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);}
-  button{
-    font-family:var(--font-body); font-size:0.9rem; font-weight:600; cursor:pointer;
-    border-radius:8px; border:1px solid transparent; padding:8px 14px;
-    background:var(--bg-sunken); color:var(--text); transition:transform .05s ease;
-  }
-  button:active{transform:translateY(1px);}
-  button:focus-visible, select:focus-visible, input:focus-visible, a:focus-visible{
-    outline:2px solid var(--accent); outline-offset:2px;
-  }
-  .btn-primary{background:var(--accent); color:#1A1206; font-weight:700;}
-  .btn-primary:hover{background:var(--accent-hover);}
-  .btn-ghost{background:transparent; border:1px solid var(--border);}
-  .btn-ghost:hover{background:var(--bg-sunken);}
-  .btn-danger{background:var(--danger-soft); color:var(--danger);}
-  .btn-danger:hover{filter:brightness(0.95);}
-  .btn-small{padding:5px 10px; font-size:0.8rem;}
-  .icon-btn{background:none; border:none; padding:4px 8px; font-size:0.95rem;}
+  .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
-  /* ---------- Auth screen ---------- */
-  .auth-wrap{display:flex; justify-content:center; padding:40px 0;}
-  .auth-card{
-    width:100%; max-width:360px; background:var(--bg-elev); border:1px solid var(--border);
-    border-radius:var(--radius); padding:28px; box-shadow:var(--shadow);
+  select, input, textarea {
+    font-family: var(--font); font-size: 0.9rem; color: var(--text);
+    background: var(--bg-elev); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 12px; outline: none; transition: border-color .15s ease;
   }
-  .auth-card h2{font-family:var(--font-display); font-size:1.35rem; margin:0 0 4px;}
-  .auth-sub{color:var(--text-muted); font-size:0.85rem; margin:0 0 20px;}
-  .tabs{display:flex; gap:4px; background:var(--bg-sunken); padding:4px; border-radius:8px; margin-bottom:18px;}
-  .tabs button{flex:1; background:transparent; padding:7px 0; font-size:0.85rem;}
-  .tabs button.active{background:var(--bg-elev); box-shadow:var(--shadow);}
-  .field{margin-bottom:14px;}
-  .field label{display:block; font-size:0.82rem; color:var(--text-muted); margin-bottom:5px;}
-  .field input, .field select{width:100%;}
-  .auth-card .btn-primary{width:100%; padding:10px; margin-top:4px;}
-  .auth-msg{font-size:0.82rem; margin-top:10px; padding:8px 10px; border-radius:8px;}
-  .auth-msg.err{background:var(--danger-soft); color:var(--danger);}
-  .auth-msg.ok{background:var(--success-soft); color:var(--success);}
-  .lang-row{display:flex; justify-content:center; margin-bottom:18px;}
+  select:focus, input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+  
+  button {
+    font-family: var(--font); font-size: 0.88rem; font-weight: 600; cursor: pointer;
+    border-radius: 8px; border: 1px solid transparent; padding: 8px 14px;
+    background: var(--bg-sunken); color: var(--text); transition: all .15s ease;
+  }
+  button:hover { filter: brightness(0.96); }
+  .btn-primary { background: var(--primary); color: white; border: none; }
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-outline { background: transparent; border: 1px solid var(--border); }
+  .btn-outline:hover { background: var(--bg-sunken); }
+  .btn-success { background: var(--success); color: white; border: none; }
+  .btn-danger { background: var(--danger-soft); color: var(--danger); }
+  .btn-sm { padding: 5px 9px; font-size: 0.8rem; border-radius: 6px; }
 
-  /* ---------- Stats strip ---------- */
-  .stats{display:flex; gap:0; margin:18px 0 22px; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:var(--bg-elev);}
-  .stat{flex:1; padding:14px 16px; text-align:left;}
-  .stat + .stat{border-left:1px solid var(--border);}
-  .stat .num{font-family:var(--font-display); font-size:1.7rem; font-weight:600; display:block; line-height:1.1;}
-  .stat .lbl{font-size:0.78rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.03em;}
-  .stat.pending .num{color:var(--warn);}
-  .stat.completed .num{color:var(--success);}
+  /* Auth Card */
+  .auth-card {
+    max-width: 380px; margin: 50px auto; background: var(--bg-elev);
+    border: 1px solid var(--border); border-radius: 14px; padding: 28px;
+    box-shadow: var(--shadow); text-align: center;
+  }
+  .auth-tabs { display: flex; gap: 6px; background: var(--bg-sunken); padding: 4px; border-radius: 8px; margin-bottom: 20px; }
+  .auth-tabs button { flex: 1; padding: 7px; background: transparent; border: none; border-radius: 6px; font-size: 0.88rem; }
+  .auth-tabs button.active { background: var(--bg-elev); color: var(--primary); font-weight: 700; box-shadow: var(--shadow); }
+  .auth-form { display: flex; flex-direction: column; gap: 12px; text-align: left; }
+  .auth-form label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); }
 
-  /* ---------- Toolbar ---------- */
-  .toolbar{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:16px;}
-  .toolbar input[type="search"]{flex:1; min-width:180px;}
-  .banner{
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
-    background:var(--accent-soft); color:var(--accent-text); border-radius:var(--radius);
-    padding:10px 14px; margin-bottom:16px; font-size:0.85rem;
+  /* Form Section */
+  .card {
+    background: var(--bg-elev); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow);
+  }
+  .card-title { font-size: 1.05rem; font-weight: 700; margin: 0 0 14px; display: flex; align-items: center; gap: 8px; }
+  .form-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 14px;
+  }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+
+  /* Filter Bar */
+  .filter-bar {
+    display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .filter-bar input[type="search"] { flex: 1; min-width: 200px; }
+
+  /* Event Rows */
+  .event-item {
+    background: var(--bg-elev); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center;
+    justify-content: space-between; gap: 12px; flex-wrap: wrap; transition: transform .1s ease;
+  }
+  .event-item:hover { border-color: var(--primary); }
+  .event-item.done { opacity: 0.65; background: var(--bg-sunken); }
+  .event-info { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 240px; }
+  .event-title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .event-title { font-size: 1rem; font-weight: 700; }
+  .event-meta { font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 2px; }
+  .event-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+  /* Badges */
+  .badge {
+    font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 6px;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .badge-cat { background: var(--primary-soft); color: var(--primary-text); }
+  .badge-high { background: var(--danger-soft); color: var(--danger); }
+  .badge-med { background: var(--warning-soft); color: var(--warning); }
+  .badge-low { background: var(--success-soft); color: var(--success); }
+  .badge-notice { background: #FEF3C7; color: #92400E; }
+  [data-theme="dark"] .badge-notice { background: #451A03; color: #FCD34D; }
+
+  /* Toasts */
+  #toasts { position: fixed; bottom: 20px; right: 20px; z-index: 100; display: flex; flex-direction: column; gap: 8px; max-width: 340px; }
+  .toast {
+    background: var(--bg-elev); border: 1px solid var(--border); border-left: 4px solid var(--primary);
+    border-radius: 8px; padding: 12px 14px; box-shadow: var(--shadow); font-size: 0.85rem;
   }
 
-  /* ---------- Form card ---------- */
-  .card{background:var(--bg-elev); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:22px; box-shadow:var(--shadow);}
-  .card h3{margin:0 0 14px; font-family:var(--font-display); font-size:1.05rem; font-weight:600;}
-  .form-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px 14px;}
-  .form-grid .full{grid-column:1 / -1;}
-  @media (max-width:560px){ .form-grid{grid-template-columns:1fr;} }
-  .form-actions{display:flex; gap:10px; margin-top:16px;}
-
-  /* ---------- Event list ---------- */
-  .section-title{
-    font-size:0.78rem; text-transform:uppercase; letter-spacing:.04em; color:var(--text-muted);
-    margin:20px 0 8px; display:flex; align-items:center; gap:8px;
+  /* Modals */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none;
+    align-items: center; justify-content: center; z-index: 90; padding: 16px;
   }
-  .section-title .dot{width:7px; height:7px; border-radius:50%;}
-  .dot.overdue{background:var(--danger);} .dot.today{background:var(--warn);}
-  .dot.upcoming{background:var(--accent);} .dot.done{background:var(--success);}
-  .event-row{
-    display:flex; align-items:center; gap:12px; background:var(--bg-elev); border:1px solid var(--border);
-    border-left:3px solid var(--border); border-radius:8px; padding:11px 14px; margin-bottom:8px; flex-wrap:wrap;
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--bg-elev); border: 1px solid var(--border); border-radius: 12px;
+    max-width: 500px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 24px; box-shadow: var(--shadow);
   }
-  .event-row.overdue{border-left-color:var(--danger);}
-  .event-row.today{border-left-color:var(--warn);}
-  .event-row.upcoming{border-left-color:var(--accent);}
-  .event-row.done{border-left-color:var(--success); opacity:0.75;}
-  .event-main{flex:1; min-width:160px;}
-  .event-main .name{font-weight:600; font-size:0.95rem;}
-  .event-main .meta{font-size:0.8rem; color:var(--text-muted); margin-top:2px;}
-  .event-main .note{font-size:0.8rem; color:var(--text-muted); font-style:italic; margin-top:2px;}
-  .event-actions{display:flex; gap:6px; flex-wrap:wrap;}
-  .empty-state{color:var(--text-muted); font-size:0.88rem; padding:18px 4px;}
-
-  /* ---------- Modal ---------- */
-  .overlay{
-    position:fixed; inset:0; background:rgba(10,13,17,.5); display:none;
-    align-items:center; justify-content:center; padding:20px; z-index:50;
-  }
-  .overlay.open{display:flex;}
-  .modal{
-    background:var(--bg-elev); border-radius:var(--radius); border:1px solid var(--border);
-    max-width:480px; width:100%; max-height:85vh; overflow-y:auto; padding:22px; box-shadow:var(--shadow);
-  }
-  .modal h3{font-family:var(--font-display); margin:0 0 14px;}
-  .modal .row{display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:0.9rem;}
-  .modal .row:last-child{border-bottom:none;}
-  .modal-close{display:flex; justify-content:flex-end; margin-top:16px;}
-  .about-body{white-space:pre-line; font-size:0.9rem; line-height:1.6; color:var(--text-muted);}
-  canvas{max-width:100%;}
-
-  /* ---------- Toasts ---------- */
-  #toasts{position:fixed; bottom:18px; right:18px; display:flex; flex-direction:column; gap:10px; z-index:80; max-width:320px;}
-  .toast{
-    background:var(--bg-elev); border:1px solid var(--border); border-left:3px solid var(--accent);
-    border-radius:8px; padding:12px 14px; box-shadow:var(--shadow); font-size:0.85rem;
-  }
-  .toast .t-actions{margin-top:8px; display:flex; gap:8px;}
-  footer.hint{color:var(--text-muted); font-size:0.78rem; text-align:center; margin-top:30px;}
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .modal-header h3 { margin: 0; font-size: 1.15rem; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -195,579 +177,552 @@
 <div id="toasts"></div>
 
 <script>
-/* ============================= i18n ============================= */
-const LANG = {
+/* ==================== CONFIG & LOCALIZATION ==================== */
+const CATEGORIES = [
+  "👶 Baby Shower",
+  "🎂 Birthday",
+  "💍 Wedding",
+  "💼 Meeting / Work",
+  "🏥 Doctor / Health",
+  "🎉 Party / Celebration",
+  "🎓 Exam / Study",
+  "✈️ Travel / Trip",
+  "💳 Bill / Payment",
+  "📌 General"
+];
+
+const REMIND_OFFSETS = [
+  { label: "At event time", mins: 0 },
+  { label: "5 minutes before", mins: 5 },
+  { label: "10 minutes before", mins: 10 },
+  { label: "15 minutes before", mins: 15 },
+  { label: "30 minutes before", mins: 30 },
+  { label: "1 hour before", mins: 60 },
+  { label: "2 hours before", mins: 120 },
+  { label: "3 hours before", mins: 180 },
+  { label: "1 day before", mins: 1440 },
+  { label: "2 days before", mins: 2880 }
+];
+
+const I18N = {
   English: {
-    login:"Login", register:"Register", username:"Username", password:"Password", confirmPassword:"Confirm password",
-    loginBtn:"Log in", registerBtn:"Create account",
-    fillAllFields:"Please fill in all fields.", invalidCreds:"Incorrect username or password.",
-    welcomeBack:"Welcome back, {u}!", regSuccess:"Account created — you can log in now.",
-    userExists:"That username is already taken.", pwMismatch:"Passwords do not match.",
-    language:"Language", theme:"Theme", logout:"Log out", greeting:"Hi, {u}",
-    themeLight:"Light", themeDark:"Dark", themeSystem:"Auto",
-    statsTotal:"Total", statsCompleted:"Completed", statsPending:"Pending",
-    searchPlaceholder:"Search by name or date…",
-    enableNotifText:"Turn on notifications and voice reminders for events that are due.",
-    enableNotifBtn:"Enable reminders", dismiss:"Dismiss",
-    formTitleAdd:"Add an event", formTitleEdit:"Edit event",
-    formName:"Event name", formDate:"Date", formTime:"Time",
-    formPhone:"Phone (with country code)", formNote:"Note",
-    addBtn:"Add event", saveBtn:"Save changes", clearBtn:"Clear",
-    requiredError:"Please enter event name, date and time.",
-    sectionOverdue:"Overdue", sectionToday:"Today", sectionUpcoming:"Upcoming", sectionDone:"Completed",
-    emptyState:"No events yet — add your first one above.",
-    noSearchResults:"No events match your search.",
-    mark:"Done", edit:"Edit", del:"Delete",
-    confirmDelete:'Delete "{n}"?', yes:"Yes", cancel:"Cancel",
-    weeklyGraphBtn:"Weekly graph", overviewBtn:"Overview", aboutBtn:"About", close:"Close",
-    overviewTitle:"Event overview",
-    chartTitle:"Completed events this week",
-    aboutTitle:"About",
-    aboutBody:"Popping Parties\nYour Perfect Event Partner\n\nDream • Plan • Celebrate\n\nNear Balaji Hospital, Mumbra Devi Colony Rd,\nSadguru Nagar, Thane, Maharashtra 400612\n\nManagement: 9967470053\nCo-Owner (WhatsApp): +91 91373 60053\nInstagram: @popping_parties\n\nPopping Reminder — Web Edition",
-    reminderPrefix:"Reminder:", reminderSuffix:"is now.",
-    sendWhatsapp:"Send WhatsApp reminder",
+    appTitle: "Event Reminder",
+    tagline: "Smart alerts with automated WhatsApp",
+    login: "Login", register: "Register",
+    username: "Username", password: "Password",
+    loginBtn: "Sign In", registerBtn: "Create Account",
+    logout: "Logout",
+    formTitleAdd: "➕ Add New Event", formTitleEdit: "✏️ Edit Event Details",
+    eventName: "Event Name *", category: "Category *", date: "Date *", time: "Time (24h) *",
+    location: "Location / Venue", remindBefore: "Remind Before",
+    phone: "WhatsApp Phone (+CountryCode)", priority: "Priority", note: "Note / Description",
+    addBtn: "Add Event ➕", saveBtn: "Save Changes ✏️", clearBtn: "Clear Form",
+    searchPlaceholder: "🔍 Search events by name, location, date, or note...",
+    weeklyStats: "📊 Weekly Activity", overview: "📋 Overview", about: "ℹ️ About",
+    testAlert: "Test Alert", viewMap: "View Map", markDone: "Mark Done", edit: "Edit", delete: "Delete"
   },
   Hindi: {
-    login:"लॉगिन", register:"रजिस्टर करें", username:"उपयोगकर्ता नाम", password:"पासवर्ड", confirmPassword:"पासवर्ड की पुष्टि करें",
-    loginBtn:"लॉगिन करें", registerBtn:"खाता बनाएं",
-    fillAllFields:"कृपया सभी फ़ील्ड भरें।", invalidCreds:"उपयोगकर्ता नाम या पासवर्ड गलत है।",
-    welcomeBack:"स्वागत है, {u}!", regSuccess:"खाता बन गया — अब आप लॉगिन कर सकते हैं।",
-    userExists:"यह नाम पहले से मौजूद है।", pwMismatch:"पासवर्ड मेल नहीं खाते।",
-    language:"भाषा", theme:"थीम", logout:"लॉगआउट", greeting:"नमस्ते, {u}",
-    themeLight:"लाइट", themeDark:"डार्क", themeSystem:"ऑटो",
-    statsTotal:"कुल", statsCompleted:"पूर्ण", statsPending:"बाकी",
-    searchPlaceholder:"नाम या तारीख से खोजें…",
-    enableNotifText:"समय पर होने वाले इवेंट्स के लिए नोटिफिकेशन और आवाज़ रिमाइंडर चालू करें।",
-    enableNotifBtn:"रिमाइंडर चालू करें", dismiss:"बंद करें",
-    formTitleAdd:"इवेंट जोड़ें", formTitleEdit:"इवेंट संपादित करें",
-    formName:"इवेंट का नाम", formDate:"तारीख", formTime:"समय",
-    formPhone:"फ़ोन (कंट्री कोड सहित)", formNote:"नोट",
-    addBtn:"इवेंट जोड़ें", saveBtn:"बदलाव सहेजें", clearBtn:"साफ़ करें",
-    requiredError:"कृपया इवेंट का नाम, तारीख और समय दर्ज करें।",
-    sectionOverdue:"समय निकल गया", sectionToday:"आज", sectionUpcoming:"आने वाले", sectionDone:"पूर्ण",
-    emptyState:"अभी कोई इवेंट नहीं है — ऊपर पहला इवेंट जोड़ें।",
-    noSearchResults:"आपकी खोज से कोई इवेंट नहीं मिला।",
-    mark:"पूर्ण", edit:"संपादित करें", del:"हटाएं",
-    confirmDelete:'"{n}" को हटाएं?', yes:"हाँ", cancel:"रद्द करें",
-    weeklyGraphBtn:"साप्ताहिक ग्राफ़", overviewBtn:"अवलोकन", aboutBtn:"बारे में", close:"बंद करें",
-    overviewTitle:"इवेंट अवलोकन",
-    chartTitle:"इस सप्ताह पूर्ण हुए इवेंट्स",
-    aboutTitle:"बारे में",
-    aboutBody:"पॉपिंग पार्टीज़\nआपका परफेक्ट इवेंट पार्टनर\n\nड्रीम • प्लान • सेलिब्रेट\n\nबालाजी हॉस्पिटल के पास, मुंब्रा देवी कॉलोनी रोड,\nसद्गुरु नगर, ठाणे, महाराष्ट्र 400612\n\nमैनेजमेंट: 9967470053\nको-ओनर (व्हाट्सएप): +91 91373 60053\nइंस्टाग्राम: @popping_parties\n\nपॉपिंग रिमाइंडर — वेब संस्करण",
-    reminderPrefix:"रिमाइंडर:", reminderSuffix:"अभी है।",
-    sendWhatsapp:"WhatsApp रिमाइंडर भेजें",
+    appTitle: "इवेंट रिमाइंडर",
+    tagline: "स्मार्ट अलर्ट और ऑटोमैटिक व्हाट्सएप",
+    login: "लॉगिन", register: "रजिस्टर",
+    username: "उपयोगकर्ता नाम", password: "पासवर्ड",
+    loginBtn: "साइन इन करें", registerBtn: "खाता बनाएं",
+    logout: "लॉगआउट",
+    formTitleAdd: "➕ नया इवेंट जोड़ें", formTitleEdit: "✏️ इवेंट संपादित करें",
+    eventName: "इवेंट का नाम *", category: "श्रेणी *", date: "तारीख *", time: "समय (24h) *",
+    location: "स्थान / वेन्यू", remindBefore: "पहले याद दिलाएं",
+    phone: "व्हाट्सएप फोन (+कंट्री कोड)", priority: "प्राथमिकता", note: "विवरण / नोट",
+    addBtn: "इवेंट जोड़ें ➕", saveBtn: "बदलाव सहेजें ✏️", clearBtn: "साफ़ करें",
+    searchPlaceholder: "🔍 नाम, स्थान, तारीख या नोट से खोजें...",
+    weeklyStats: "📊 साप्ताहिक चार्ट", overview: "📋 अवलोकन", about: "ℹ️ जानकारी",
+    testAlert: "टेस्ट अलर्ट", viewMap: "मैप देखें", markDone: "पूर्ण", edit: "संपादित करें", delete: "हटाएं"
   },
   Marathi: {
-    login:"लॉगिन", register:"नोंदणी करा", username:"वापरकर्ता नाव", password:"पासवर्ड", confirmPassword:"पासवर्ड पडताळा",
-    loginBtn:"लॉगिन करा", registerBtn:"खाते तयार करा",
-    fillAllFields:"कृपया सर्व रकाने भरा.", invalidCreds:"वापरकर्ता नाव किंवा पासवर्ड चुकीचा आहे.",
-    welcomeBack:"पुन्हा स्वागत आहे, {u}!", regSuccess:"खाते तयार झाले — आता तुम्ही लॉगिन करू शकता.",
-    userExists:"हे नाव आधीपासूनच अस्तित्वात आहे.", pwMismatch:"पासवर्ड जुळत नाहीत.",
-    language:"भाषा", theme:"थीम", logout:"लॉगआऊट", greeting:"नमस्कार, {u}",
-    themeLight:"लाइट", themeDark:"डार्क", themeSystem:"ऑटो",
-    statsTotal:"एकूण", statsCompleted:"पूर्ण", statsPending:"बाकी",
-    searchPlaceholder:"नाव किंवा तारखेने शोधा…",
-    enableNotifText:"वेळेवर असलेल्या इव्हेंट्ससाठी सूचना आणि आवाज रिमाइंडर सुरू करा.",
-    enableNotifBtn:"रिमाइंडर सुरू करा", dismiss:"बंद करा",
-    formTitleAdd:"इव्हेंट जोडा", formTitleEdit:"इव्हेंट संपादित करा",
-    formName:"इव्हेंटचे नाव", formDate:"तारीख", formTime:"वेळ",
-    formPhone:"फोन (कंट्री कोडसह)", formNote:"टीप",
-    addBtn:"इव्हेंट जोडा", saveBtn:"बदल जतन करा", clearBtn:"साफ करा",
-    requiredError:"कृपया इव्हेंटचे नाव, तारीख आणि वेळ भरा.",
-    sectionOverdue:"वेळ निघून गेली", sectionToday:"आज", sectionUpcoming:"पुढील", sectionDone:"पूर्ण",
-    emptyState:"अजून कोणताही इव्हेंट नाही — वर पहिला इव्हेंट जोडा.",
-    noSearchResults:"तुमच्या शोधाशी जुळणारा इव्हेंट सापडला नाही.",
-    mark:"पूर्ण", edit:"संपादित करा", del:"काढा",
-    confirmDelete:'"{n}" काढायचे?', yes:"होय", cancel:"रद्द करा",
-    weeklyGraphBtn:"साप्ताहिक आलेख", overviewBtn:"आढावा", aboutBtn:"विषयी", close:"बंद करा",
-    overviewTitle:"इव्हेंट आढावा",
-    chartTitle:"या आठवड्यात पूर्ण झालेले इव्हेंट्स",
-    aboutTitle:"विषयी",
-    aboutBody:"पॉपिंग पार्टीज\nतुमचा परफेक्ट इव्हेंट पार्टनर\n\nड्रीम • प्लान • सेलिब्रेट\n\nबालाजी हॉस्पिटलजवळ, मुंब्रा देवी कॉलनी रोड,\nसद्गुरू नगर, ठाणे, महाराष्ट्र 400612\n\nमॅनेजमेंट: 9967470053\nको-ओनर (व्हॉट्सअ‍ॅप): +91 91373 60053\nइन्स्टाग्राम: @popping_parties\n\nपॉपिंग रिमाइंडर — वेब आवृत्ती",
-    reminderPrefix:"रिमाइंडर:", reminderSuffix:"आता आहे.",
-    sendWhatsapp:"WhatsApp रिमाइंडर पाठवा",
+    appTitle: "इव्हेंट रिमाइंडर",
+    tagline: "स्मार्ट अलर्ट आणि स्वयंचलित व्हॉट्सअ‍ॅप",
+    login: "लॉगिन", register: "नोंदणी",
+    username: "वापरकर्ता नाव", password: "पासवर्ड",
+    loginBtn: "साइन इन करा", registerBtn: "खाते तयार करा",
+    logout: "लॉगआऊट",
+    formTitleAdd: "➕ नवीन इव्हेंट जोडा", formTitleEdit: "✏️ इव्हेंट संपादित करा",
+    eventName: "इव्हेंटचे नाव *", category: "श्रेणी *", date: "तारीख *", time: "वेळ (24h) *",
+    location: "स्थान / ठिकाण", remindBefore: "आधी आठवण करा",
+    phone: "व्हॉट्सअ‍ॅप फोन (+देश कोड)", priority: "प्राधान्य", note: "नोंद / माहिती",
+    addBtn: "इव्हेंट जोडा ➕", saveBtn: "बदल जतन करा ✏️", clearBtn: "साफ करा",
+    searchPlaceholder: "🔍 नाव, स्थान, तारीख किंवा माहितीने शोधा...",
+    weeklyStats: "📊 साप्ताहिक आलेख", overview: "📋 आढावा", about: "ℹ️ माहिती",
+    testAlert: "चाचणी अलर्ट", viewMap: "नकाशा पहा", markDone: "पूर्ण", edit: "संपादित करा", delete: "काढा"
   }
 };
-function t(key, vars){
-  let s = (LANG[state.lang] && LANG[state.lang][key]) || LANG.English[key] || key;
-  if(vars) for(const k in vars) s = s.replace('{'+k+'}', vars[k]);
-  return s;
-}
 
-/* ============================= storage ============================= */
-const LS_USERS = 'er.users';
-const LS_SESSION = 'er.session';
-const LS_LANG = 'er.lang';
-const LS_THEME = 'er.theme';
-function evKey(u){ return 'er.events.' + u; }
-
-function safeGet(key, fallback){
-  try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
-  catch(e){ return fallback; }
-}
-function safeSet(key, val){
-  try{ localStorage.setItem(key, JSON.stringify(val)); return true; }
-  catch(e){ console.error('Storage error', e); return false; }
-}
-function loadUsers(){ return safeGet(LS_USERS, {}); }
-function saveUsers(u){ safeSet(LS_USERS, u); }
-function loadEvents(username){ return safeGet(evKey(username), []); }
-function saveEvents(username, events){ safeSet(evKey(username), events); }
-
-async function hashPw(pw){
-  try{
-    const enc = new TextEncoder().encode(pw);
-    const buf = await crypto.subtle.digest('SHA-256', enc);
-    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  }catch(e){ return btoa(unescape(encodeURIComponent(pw))); }
-}
-
-/* ============================= state ============================= */
-const state = {
-  user: safeGet(LS_SESSION, null),
-  lang: safeGet(LS_LANG, 'English'),
-  theme: safeGet(LS_THEME, 'system'),
-  authMode: 'login',
-  authMsg: null,
+/* ==================== STATE MANAGEMENT ==================== */
+let state = {
+  lang: localStorage.getItem("er_lang") || "English",
+  theme: localStorage.getItem("er_theme") || "dark",
+  user: localStorage.getItem("er_user") || null,
   events: [],
   editingId: null,
-  search: '',
-  notifOn: false,
-  notifDismissed: safeGet('er.notifDismissed', false),
+  search: "",
+  filterCategory: "All",
+  filterPriority: "All",
+  activeTab: "login"
 };
-if(state.user){ state.events = loadEvents(state.user); }
-applyTheme();
 
-function applyTheme(){
-  const root = document.documentElement;
-  if(state.theme === 'light') root.setAttribute('data-theme','light');
-  else if(state.theme === 'dark') root.setAttribute('data-theme','dark');
-  else root.removeAttribute('data-theme');
+document.documentElement.setAttribute("data-theme", state.theme);
+
+function t(key) {
+  return (I18N[state.lang] && I18N[state.lang][key]) || I18N.English[key] || key;
 }
 
-/* ============================= toasts ============================= */
-function showToast(html, timeout){
-  const wrap = document.getElementById('toasts');
-  const el = document.createElement('div');
-  el.className = 'toast';
-  el.innerHTML = html;
-  wrap.appendChild(el);
-  setTimeout(()=>{ el.remove(); }, timeout || 9000);
+function loadEvents() {
+  if (!state.user) { state.events = []; return; }
+  try {
+    const raw = localStorage.getItem(`er_events_${state.user}`);
+    state.events = raw ? JSON.parse(raw) : [];
+  } catch(e) { state.events = []; }
 }
 
-/* ============================= reminder engine ============================= */
-function speak(text){
-  try{
-    if('speechSynthesis' in window){
+function saveEvents() {
+  if (!state.user) return;
+  localStorage.setItem(`er_events_${state.user}`, JSON.stringify(state.events));
+}
+
+function showToast(html, duration = 6000) {
+  const container = document.getElementById("toasts");
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.innerHTML = html;
+  container.appendChild(toast);
+  setTimeout(() => { toast.remove(); }, duration);
+}
+
+function speak(text) {
+  try {
+    if ('speechSynthesis' in window) {
       const u = new SpeechSynthesisUtterance(text);
-      window.speechSynthesis.speak(u);
+      u.rate = 1.0;
+      speechSynthesis.speak(u);
     }
-  }catch(e){ console.error('speech error', e); }
+  } catch(e) {}
 }
-function notifyOS(title, body){
-  try{
-    if('Notification' in window && Notification.permission === 'granted'){
-      new Notification(title, { body });
-    }
-  }catch(e){ console.error('notification error', e); }
-}
-function waLink(phone, message){
-  const digits = (phone||'').replace(/[^\d]/g,'');
-  return 'https://wa.me/' + digits + '?text=' + encodeURIComponent(message);
-}
-function sendWhatsappAuto(phone, message){
-  // Tries the backend API route (only exists when this app is deployed with the
-  // Twilio backend, e.g. on Vercel). On the Claude-hosted preview link there is
-  // no backend, so this will fail and we fall back to the manual wa.me link.
-  return fetch('api/send-whatsapp', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ to: phone, message })
-  }).then(r=>{ if(!r.ok) throw new Error('backend responded with error'); return true; })
-    .catch(()=> false);
-}
-function checkReminders(){
-  if(!state.user) return;
-  const now = new Date();
-  let changed = false;
-  state.events.forEach(e=>{
-    if(e.done) return;
-    const dt = new Date(e.date + 'T' + (e.time||'00:00'));
-    if(isNaN(dt)) return;
-    const diffMs = dt - now;
-    if(diffMs <= 0 && diffMs > -60000){
-      const msg = `${t('reminderPrefix')} ${e.name} ${t('reminderSuffix')}`;
-      speak(msg);
-      notifyOS('Popping Reminder', msg);
-      if(e.phone){
-        sendWhatsappAuto(e.phone, msg).then(sent=>{
-          if(sent){
-            showToast(`<strong>${esc(msg)}</strong><div class="t-actions" style="color:var(--success);">✓ ${t('sendWhatsapp')}</div>`, 8000);
-          } else {
-            const extra = `<div class="t-actions"><a class="btn-small btn-primary" style="text-decoration:none;padding:5px 10px;border-radius:8px;" target="_blank" rel="noopener" href="${waLink(e.phone, msg)}">${t('sendWhatsapp')}</a></div>`;
-            showToast(`<strong>${esc(msg)}</strong>${extra}`, 15000);
-          }
-        });
-      } else {
-        showToast(`<strong>${esc(msg)}</strong>`, 15000);
-      }
-      e.done = true;
-      changed = true;
-    }
-  });
-  if(changed){ saveEvents(state.user, state.events); render(); }
-}
-setInterval(checkReminders, 30000);
 
-/* ============================= actions ============================= */
-async function handleLogin(username, password){
-  username = username.trim(); password = password.trim();
-  if(!username || !password){ state.authMsg = {type:'err', text:t('fillAllFields')}; return render(); }
-  const users = loadUsers();
-  const hp = await hashPw(password);
-  if(users[username] && users[username] === hp){
+/* ==================== AUTOMATED WHATSAPP (TWILIO / WA.ME) ==================== */
+function sendWhatsapp(phone, message) {
+  if (!phone) return;
+  const cleanPhone = phone.trim().startsWith("+") ? phone.trim() : "+" + phone.trim();
+  
+  // Call Vercel serverless function (POST /api/send-whatsapp)
+  fetch("/api/send-whatsapp", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ to: cleanPhone, message: message })
+  })
+  .then(res => {
+    if (res.ok) {
+      showToast(`✅ WhatsApp message sent automatically to <b>${cleanPhone}</b>`);
+    } else {
+      throw new Error("Vercel backend returned non-200");
+    }
+  })
+  .catch(() => {
+    // Fallback: wa.me instant link
+    const waUrl = `https://wa.me/${cleanPhone.replace(/[^\d]/g, "")}?text=${encodeURIComponent(message)}`;
+    showToast(`
+      ⚠️ Automatic WhatsApp API not configured.<br>
+      <a href="${waUrl}" target="_blank" class="btn-sm btn-primary" style="display:inline-block;margin-top:6px;">📲 Open WhatsApp to Send</a>
+    `, 12000);
+  });
+}
+
+function triggerAlert(ev) {
+  const isAdvance = ev.remindBefore && ev.remindBefore !== "At event time";
+  const timingDesc = isAdvance ? `in ${ev.remindBefore.replace(" before", "")}` : "NOW!";
+  const mapsUrl = ev.location ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.location)}` : "";
+
+  // 1. Spoken Audio
+  speak(`Reminder: ${ev.name} is happening ${timingDesc}!`);
+
+  // 2. Browser OS Notification
+  if ('Notification' in window && Notification.permission === "granted") {
+    new Notification(`🗓️ Reminder: ${ev.name}`, {
+      body: `${ev.category} • ${ev.date} ${ev.time}\n` + (ev.location ? `📍 ${ev.location}\n` : "") + `Alert: ${timingDesc}`
+    });
+  }
+
+  // 3. WhatsApp Message
+  if (ev.phone) {
+    let waMsg = `🔔 *Event Reminder: ${ev.name}*\n`;
+    waMsg += `⏰ *Happening ${timingDesc}*\n`;
+    waMsg += `📂 Category: ${ev.category}\n`;
+    waMsg += `📅 Date & Time: ${ev.date} ${ev.time}\n`;
+    if (ev.location) {
+      waMsg += `📍 Location: ${ev.location}\n`;
+      waMsg += `🗺️ Maps: ${mapsUrl}\n`;
+    }
+    if (ev.note) waMsg += `📝 Note: ${ev.note}\n`;
+    waMsg += `\n_Sent automatically by Event Reminder_`;
+    sendWhatsapp(ev.phone, waMsg);
+  }
+
+  // 4. In-App Toast
+  showToast(`
+    <b>🔔 Reminder: ${ev.name} (${timingDesc})</b><br>
+    📂 ${ev.category} • 📅 ${ev.date} ${ev.time}<br>
+    ${ev.location ? `📍 ${ev.location} <a href="${mapsUrl}" target="_blank" style="margin-left:4px;font-weight:bold;">[Open Map]</a><br>` : ""}
+    ${ev.phone ? `📱 Sent to WhatsApp (${ev.phone})` : ""}
+  `, 10000);
+}
+
+/* ==================== BACKGROUND MONITOR LOOP ==================== */
+function checkReminders() {
+  if (!state.user || !state.events.length) return;
+  const now = new Date();
+
+  state.events.forEach(e => {
+    if (e.done || e.notified) return;
+
+    try {
+      const eventDt = new Date(`${e.date}T${e.time}:00`);
+      if (isNaN(eventDt.getTime())) return;
+
+      const offsetEntry = REMIND_OFFSETS.find(o => o.label === e.remindBefore) || { mins: 0 };
+      const triggerDt = new Date(eventDt.getTime() - offsetEntry.mins * 60000);
+
+      const diffMs = triggerDt - now;
+      if (diffMs <= 0 && diffMs > -60000) {
+        e.notified = true;
+        triggerAlert(e);
+        saveEvents();
+        render();
+      }
+    } catch(err) {}
+  });
+}
+setInterval(checkReminders, 20000);
+
+/* ==================== ACTIONS ==================== */
+function handleAuth(type, username, password) {
+  if (!username || !password) return alert("Please fill all credentials");
+  let users = JSON.parse(localStorage.getItem("er_registered_users") || "{}");
+
+  if (type === "register") {
+    if (users[username]) return alert("Username already exists!");
+    users[username] = password;
+    localStorage.setItem("er_registered_users", JSON.stringify(users));
     state.user = username;
-    state.events = loadEvents(username);
-    safeSet(LS_SESSION, username);
-    state.authMsg = null;
+    localStorage.setItem("er_user", username);
+    loadEvents();
     render();
   } else {
-    state.authMsg = {type:'err', text:t('invalidCreds')};
+    if (!users[username] || users[username] !== password) {
+      return alert("Invalid username or password");
+    }
+    state.user = username;
+    localStorage.setItem("er_user", username);
+    loadEvents();
     render();
   }
 }
-async function handleRegister(username, password, confirm){
-  username = username.trim(); password = password.trim(); confirm = confirm.trim();
-  if(!username || !password || !confirm){ state.authMsg = {type:'err', text:t('fillAllFields')}; return render(); }
-  if(password !== confirm){ state.authMsg = {type:'err', text:t('pwMismatch')}; return render(); }
-  const users = loadUsers();
-  if(users[username]){ state.authMsg = {type:'err', text:t('userExists')}; return render(); }
-  users[username] = await hashPw(password);
-  saveUsers(users);
-  state.authMode = 'login';
-  state.authMsg = {type:'ok', text:t('regSuccess')};
-  render();
-}
-function handleLogout(){
-  state.user = null; state.events = []; state.editingId = null; state.search = '';
-  localStorage.removeItem(LS_SESSION);
-  render();
-}
-function addOrUpdateEvent(data){
-  if(!data.name || !data.date || !data.time){
-    showToast(t('requiredError'));
-    return;
-  }
-  if(state.editingId){
-    const idx = state.events.findIndex(e=>e.id === state.editingId);
-    if(idx >= 0) state.events[idx] = {...state.events[idx], ...data};
+
+function handleSaveEvent(e) {
+  e.preventDefault();
+  const form = e.target;
+  const name = form.name.value.trim();
+  const category = form.category.value;
+  const date = form.date.value;
+  const time = form.time.value;
+  const location = form.location.value.trim();
+  const remindBefore = form.remindBefore.value;
+  const phone = form.phone.value.trim();
+  const priority = form.priority.value;
+  const note = form.note.value.trim();
+
+  if (!name || !date || !time) return alert("Please fill Event Name, Date, and Time.");
+
+  if (state.editingId) {
+    const idx = state.events.findIndex(x => x.id === state.editingId);
+    if (idx !== -1) {
+      state.events[idx] = { ...state.events[idx], name, category, date, time, location, remindBefore, phone, priority, note, done: false, notified: false };
+    }
     state.editingId = null;
   } else {
-    state.events.push({ id: Date.now().toString(36)+Math.random().toString(36).slice(2,7), done:false, ...data });
+    state.events.unshift({
+      id: "ev_" + Date.now().toString(36),
+      name, category, date, time, location, remindBefore, phone, priority, note,
+      done: false, notified: false
+    });
   }
-  saveEvents(state.user, state.events);
+
+  saveEvents();
+  render();
+  showToast(`✅ Event '<b>${name}</b>' saved successfully!`);
+}
+
+function deleteEvent(id) {
+  if (!confirm("Are you sure you want to delete this event?")) return;
+  state.events = state.events.filter(e => e.id !== id);
+  saveEvents();
   render();
 }
-function deleteEvent(id){
-  const ev = state.events.find(e=>e.id===id);
-  if(!ev) return;
-  if(!confirm(t('confirmDelete',{n:ev.name}))) return;
-  state.events = state.events.filter(e=>e.id!==id);
-  saveEvents(state.user, state.events);
-  render();
+
+function markDone(id) {
+  const ev = state.events.find(e => e.id === id);
+  if (ev) {
+    ev.done = true;
+    ev.notified = true;
+    saveEvents();
+    render();
+  }
 }
-function markDone(id){
-  const ev = state.events.find(e=>e.id===id);
-  if(ev){ ev.done = true; saveEvents(state.user, state.events); render(); }
-}
-function startEdit(id){
+
+function editEvent(id) {
   state.editingId = id;
   render();
-  const el = document.getElementById('formCard');
-  if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
-}
-function clearForm(){ state.editingId = null; render(); }
-function enableReminders(){
-  try{
-    if('Notification' in window && Notification.requestPermission){
-      Notification.requestPermission().then(()=>{ render(); });
-    }
-  }catch(e){}
-  state.notifOn = true;
-  render();
-  showToast(t('enableNotifBtn') + ' ✓');
-}
-function dismissNotifBanner(){
-  state.notifDismissed = true;
-  safeSet('er.notifDismissed', true);
-  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-/* ============================= grouping ============================= */
-function groupEvents(){
-  const now = new Date();
-  const todayStr = now.toISOString().slice(0,10);
-  const q = state.search.trim().toLowerCase();
-  const filtered = state.events.filter(e=>{
-    if(!q) return true;
-    return e.name.toLowerCase().includes(q) || e.date.includes(q);
-  });
-  const groups = { overdue:[], today:[], upcoming:[], done:[] };
-  filtered.forEach(e=>{
-    if(e.done){ groups.done.push(e); return; }
-    const dt = new Date(e.date + 'T' + (e.time||'00:00'));
-    if(dt < now) groups.overdue.push(e);
-    else if(e.date === todayStr) groups.today.push(e);
-    else groups.upcoming.push(e);
-  });
-  groups.overdue.sort((a,b)=> (a.date+a.time).localeCompare(b.date+b.time));
-  groups.today.sort((a,b)=> (a.date+a.time).localeCompare(b.date+b.time));
-  groups.upcoming.sort((a,b)=> (a.date+a.time).localeCompare(b.date+b.time));
-  groups.done.sort((a,b)=> (b.date+b.time).localeCompare(a.date+a.time));
-  return {groups, total: filtered.length};
-}
+/* ==================== RENDER UI ==================== */
+function render() {
+  const root = document.getElementById("root");
 
-/* ============================= rendering ============================= */
-function esc(s){ return (s||'').toString().replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-function renderLangSelect(id){
-  return `<select id="${id}" onchange="state.lang=this.value; safeSet(LS_LANG,this.value); render();">
-    ${Object.keys(LANG).map(l=>`<option value="${l}" ${state.lang===l?'selected':''}>${l}</option>`).join('')}
-  </select>`;
-}
-function renderThemeSelect(){
-  return `<select onchange="state.theme=this.value; safeSet(LS_THEME,this.value); applyTheme();">
-    <option value="system" ${state.theme==='system'?'selected':''}>${t('themeSystem')}</option>
-    <option value="light" ${state.theme==='light'?'selected':''}>${t('themeLight')}</option>
-    <option value="dark" ${state.theme==='dark'?'selected':''}>${t('themeDark')}</option>
-  </select>`;
-}
-
-function renderAuth(){
-  const isLogin = state.authMode === 'login';
-  return `
-  <div class="topbar">
-    <div class="brand"><span class="crown">👑</span><h1>Popping Reminder</h1><span class="tagline">Your Perfect Event Partner</span></div>
-    <div class="controls">${renderThemeSelect()}</div>
-  </div>
-  <div class="auth-wrap">
-    <div class="auth-card">
-      <div class="lang-row">${renderLangSelect('authLang')}</div>
-      <div class="tabs">
-        <button class="${isLogin?'active':''}" onclick="state.authMode='login'; state.authMsg=null; render();">${t('login')}</button>
-        <button class="${!isLogin?'active':''}" onclick="state.authMode='register'; state.authMsg=null; render();">${t('register')}</button>
+  // Auth Screen
+  if (!state.user) {
+    root.innerHTML = `
+      <div class="header">
+        <div class="brand">
+          <span class="logo">🗓️</span>
+          <h1>${t("appTitle")}</h1>
+        </div>
+        <div class="header-actions">
+          <select onchange="state.lang=this.value; localStorage.setItem('er_lang', this.value); render();">
+            <option value="English" ${state.lang==='English'?'selected':''}>English</option>
+            <option value="Hindi" ${state.lang==='Hindi'?'selected':''}>हिंदी</option>
+            <option value="Marathi" ${state.lang==='Marathi'?'selected':''}>मराठी</option>
+          </select>
+          <button class="btn-outline btn-sm" onclick="toggleTheme()">🌓</button>
+        </div>
       </div>
-      <h2>${isLogin ? t('login') : t('register')}</h2>
-      <p class="auth-sub">${isLogin ? '' : ''}</p>
-      <div class="field"><label>${t('username')}</label><input id="f_user" type="text" autocomplete="username"/></div>
-      <div class="field"><label>${t('password')}</label><input id="f_pass" type="password" autocomplete="${isLogin?'current-password':'new-password'}"/></div>
-      ${isLogin ? '' : `<div class="field"><label>${t('confirmPassword')}</label><input id="f_conf" type="password"/></div>`}
-      <button class="btn-primary" onclick="${isLogin?'submitLogin()':'submitRegister()'}">${isLogin ? t('loginBtn') : t('registerBtn')}</button>
-      ${state.authMsg ? `<div class="auth-msg ${state.authMsg.type==='err'?'err':'ok'}">${esc(state.authMsg.text)}</div>` : ''}
+
+      <div class="auth-card">
+        <h2 style="margin:0 0 4px;font-size:1.4rem;">🗓️ ${t("appTitle")}</h2>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin:0 0 20px;">${t("tagline")}</p>
+
+        <div class="auth-tabs">
+          <button class="${state.activeTab==='login'?'active':''}" onclick="state.activeTab='login';render();">${t("login")}</button>
+          <button class="${state.activeTab==='register'?'active':''}" onclick="state.activeTab='register';render();">${t("register")}</button>
+        </div>
+
+        <form class="auth-form" onsubmit="event.preventDefault(); handleAuth(state.activeTab, this.user.value.trim(), this.pass.value.trim());">
+          <div class="field">
+            <label>${t("username")}</label>
+            <input type="text" name="user" required placeholder="e.g. rohan, om, prince" />
+          </div>
+          <div class="field">
+            <label>${t("password")}</label>
+            <input type="password" name="pass" required placeholder="••••••••" />
+          </div>
+          <button type="submit" class="btn-primary" style="margin-top:10px;padding:10px;">
+            ${state.activeTab==='login' ? t("loginBtn") : t("registerBtn")}
+          </button>
+        </form>
+      </div>
+    `;
+    return;
+  }
+
+  // Main Dashboard
+  const editingEvent = state.events.find(e => e.id === state.editingId) || null;
+  const q = state.search.toLowerCase();
+  const filteredEvents = state.events.filter(e => {
+    const matchesSearch = !q || e.name.toLowerCase().includes(q) || (e.location && e.location.toLowerCase().includes(q)) || e.date.includes(q);
+    const matchesCat = state.filterCategory === "All" || e.category === state.filterCategory;
+    const matchesPrio = state.filterPriority === "All" || e.priority === state.filterPriority;
+    return matchesSearch && matchesCat && matchesPrio;
+  });
+
+  root.innerHTML = `
+    <!-- Top Bar -->
+    <div class="header">
+      <div class="brand">
+        <span class="logo">🗓️</span>
+        <div>
+          <h1>${t("appTitle")}</h1>
+          <div style="font-size:0.75rem;color:var(--text-muted);">👤 Logged in as <b>${state.user}</b></div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-outline btn-sm" onclick="showOverviewModal()">📋 ${t("overview")}</button>
+        <button class="btn-outline btn-sm" onclick="showWeeklyModal()">📊 ${t("weeklyStats")}</button>
+        <select onchange="state.lang=this.value; localStorage.setItem('er_lang', this.value); render();">
+          <option value="English" ${state.lang==='English'?'selected':''}>English</option>
+          <option value="Hindi" ${state.lang==='Hindi'?'selected':''}>हिंदी</option>
+          <option value="Marathi" ${state.lang==='Marathi'?'selected':''}>मराठी</option>
+        </select>
+        <button class="btn-outline btn-sm" onclick="toggleTheme()">🌓</button>
+        <button class="btn-danger btn-sm" onclick="state.user=null;localStorage.removeItem('er_user');render();">${t("logout")}</button>
+      </div>
     </div>
-  </div>
-  <footer class="hint">Data is stored privately in this browser only.</footer>
+
+    <!-- Event Input Card -->
+    <div class="card">
+      <div class="card-title">${editingEvent ? t("formTitleEdit") : t("formTitleAdd")}</div>
+      <form onsubmit="handleSaveEvent(event)">
+        <div class="form-grid">
+          <div class="field">
+            <label>${t("category")}</label>
+            <select name="category">
+              ${CATEGORIES.map(c => `<option value="${c}" ${editingEvent&&editingEvent.category===c?'selected':''}>${c}</option>`).join("")}
+            </select>
+          </div>
+          <div class="field">
+            <label>${t("eventName")}</label>
+            <input type="text" name="name" required placeholder="e.g. Baby Shower, Birthday Party" value="${editingEvent?editingEvent.name:''}" />
+          </div>
+          <div class="field">
+            <label>${t("date")}</label>
+            <input type="date" name="date" required value="${editingEvent?editingEvent.date:new Date().toISOString().slice(0,10)}" />
+          </div>
+          <div class="field">
+            <label>${t("time")}</label>
+            <input type="time" name="time" required value="${editingEvent?editingEvent.time:'18:00'}" />
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label>${t("location")}</label>
+            <input type="text" name="location" placeholder="e.g. Grand Celebration Hall, Mumbai" value="${editingEvent?editingEvent.location||'':''}" />
+          </div>
+          <div class="field">
+            <label>${t("remindBefore")}</label>
+            <select name="remindBefore">
+              ${REMIND_OFFSETS.map(o => `<option value="${o.label}" ${editingEvent&&editingEvent.remindBefore===o.label?'selected':(o.label==='1 hour before'?'selected':'')}>${o.label}</option>`).join("")}
+            </select>
+          </div>
+          <div class="field">
+            <label>${t("phone")}</label>
+            <input type="tel" name="phone" placeholder="+919876543210" value="${editingEvent?editingEvent.phone||'':''}" />
+          </div>
+          <div class="field">
+            <label>${t("priority")}</label>
+            <select name="priority">
+              <option value="High" ${editingEvent&&editingEvent.priority==='High'?'selected':''}>🔴 High</option>
+              <option value="Medium" ${!editingEvent||editingEvent.priority==='Medium'?'selected':''}>🟡 Medium</option>
+              <option value="Low" ${editingEvent&&editingEvent.priority==='Low'?'selected':''}>🟢 Low</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field" style="margin-bottom:14px;">
+          <label>${t("note")}</label>
+          <input type="text" name="note" placeholder="Dress code, gift instructions, meeting notes..." value="${editingEvent?editingEvent.note||'':''}" />
+        </div>
+
+        <div style="display:flex;gap:8px;">
+          <button type="submit" class="btn-primary">${editingEvent ? t("saveBtn") : t("addBtn")}</button>
+          ${editingEvent ? `<button type="button" class="btn-outline" onclick="state.editingId=null;render();">${t("clearBtn")}</button>` : ''}
+          <button type="button" class="btn-outline" style="margin-left:auto;" onclick="exportCSV()">📥 Export CSV</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <div class="filter-bar">
+      <input type="search" placeholder="${t("searchPlaceholder")}" value="${state.search}" oninput="state.search=this.value;render();" />
+      <select onchange="state.filterCategory=this.value;render();">
+        <option value="All">All Categories</option>
+        ${CATEGORIES.map(c => `<option value="${c}" ${state.filterCategory===c?'selected':''}>${c}</option>`).join("")}
+      </select>
+      <select onchange="state.filterPriority=this.value;render();">
+        <option value="All">All Priorities</option>
+        <option value="High" ${state.filterPriority==='High'?'selected':''}>🔴 High</option>
+        <option value="Medium" ${state.filterPriority==='Medium'?'selected':''}>🟡 Medium</option>
+        <option value="Low" ${state.filterPriority==='Low'?'selected':''}>🟢 Low</option>
+      </select>
+    </div>
+
+    <!-- Events List -->
+    <div class="events-list">
+      ${filteredEvents.length === 0 ? `
+        <div style="text-align:center;padding:40px;color:var(--text-muted);">
+          <div style="font-size:2rem;margin-bottom:8px;">🎈</div>
+          <b>No events found.</b><br>
+          Add your first event with the form above!
+        </div>
+      ` : filteredEvents.map(e => `
+        <div class="event-item ${e.done ? 'done' : ''}">
+          <div class="event-info">
+            <div class="event-title-row">
+              <span class="badge badge-cat">${e.category || '📌 General'}</span>
+              <span class="event-title">${e.name}</span>
+              <span class="badge ${e.priority==='High'?'badge-high':(e.priority==='Low'?'badge-low':'badge-med')}">${e.priority || 'Medium'}</span>
+              ${e.remindBefore && e.remindBefore!=='At event time' ? `<span class="badge badge-notice">⏰ ${e.remindBefore}</span>` : ''}
+              ${e.done ? `<span class="badge badge-low">✔ Done</span>` : ''}
+            </div>
+            <div class="event-meta">
+              <span>📅 ${e.date} at ${e.time}</span>
+              ${e.location ? `<span>📍 ${e.location} <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.location)}" target="_blank" style="font-weight:600;">[Map]</a></span>` : ''}
+              ${e.phone ? `<span>📱 ${e.phone}</span>` : ''}
+              ${e.note ? `<span>📝 <i>${e.note}</i></span>` : ''}
+            </div>
+          </div>
+          <div class="event-actions">
+            ${!e.done ? `<button class="btn-success btn-sm" onclick="markDone('${e.id}')">✔</button>` : ''}
+            <button class="btn-outline btn-sm" onclick="triggerAlert(state.events.find(x=>x.id==='${e.id}'))" title="Test Alert Immediately">🚀</button>
+            <button class="btn-outline btn-sm" onclick="editEvent('${e.id}')">✏️</button>
+            <button class="btn-danger btn-sm" onclick="deleteEvent('${e.id}')">🗑</button>
+          </div>
+        </div>
+      `).join("")}
+    </div>
   `;
 }
-function submitLogin(){ handleLogin(document.getElementById('f_user').value, document.getElementById('f_pass').value); }
-function submitRegister(){ handleRegister(document.getElementById('f_user').value, document.getElementById('f_pass').value, document.getElementById('f_conf').value); }
 
-function eventRow(e, kind){
-  return `
-  <div class="event-row ${kind}">
-    <div class="event-main">
-      <div class="name">${esc(e.name)}</div>
-      <div class="meta">${esc(e.date)} · ${esc(e.time)}${e.phone ? ' · '+esc(e.phone) : ''}</div>
-      ${e.note ? `<div class="note">${esc(e.note)}</div>` : ''}
-    </div>
-    <div class="event-actions">
-      ${!e.done ? `<button class="btn-small btn-ghost" onclick="markDone('${e.id}')">${t('mark')}</button>` : ''}
-      <button class="btn-small btn-ghost" onclick="startEdit('${e.id}')">${t('edit')}</button>
-      <button class="btn-small btn-danger" onclick="deleteEvent('${e.id}')">${t('del')}</button>
-    </div>
-  </div>`;
-}
-function section(title, dotClass, list, kind){
-  if(list.length === 0) return '';
-  return `<div class="section-title"><span class="dot ${dotClass}"></span>${title} (${list.length})</div>` +
-    list.map(e=>eventRow(e,kind)).join('');
+function toggleTheme() {
+  state.theme = state.theme === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", state.theme);
+  localStorage.setItem("er_theme", state.theme);
+  render();
 }
 
-function renderApp(){
-  const { groups, total } = groupEvents();
-  const completed = state.events.filter(e=>e.done).length;
-  const pending = state.events.length - completed;
-  const editing = state.editingId ? state.events.find(e=>e.id===state.editingId) : null;
-
-  const notifBanner = (!state.notifDismissed && !state.notifOn) ? `
-  <div class="banner">
-    <span>🔔 ${t('enableNotifText')}</span>
-    <span style="display:flex;gap:8px;">
-      <button class="btn-small btn-primary" onclick="enableReminders()">${t('enableNotifBtn')}</button>
-      <button class="btn-small btn-ghost" onclick="dismissNotifBanner()">${t('dismiss')}</button>
-    </span>
-  </div>` : '';
-
-  let listHtml;
-  if(state.events.length === 0){
-    listHtml = `<div class="empty-state">${t('emptyState')}</div>`;
-  } else if(total === 0){
-    listHtml = `<div class="empty-state">${t('noSearchResults')}</div>`;
-  } else {
-    listHtml = section(t('sectionOverdue'),'overdue',groups.overdue,'overdue')
-      + section(t('sectionToday'),'today',groups.today,'today')
-      + section(t('sectionUpcoming'),'upcoming',groups.upcoming,'upcoming')
-      + section(t('sectionDone'),'done',groups.done,'done');
-  }
-
-  return `
-  <div class="topbar">
-    <div class="brand"><span class="crown">👑</span><h1>Popping Reminder</h1><span class="tagline">Your Perfect Event Partner</span></div>
-    <div class="controls">
-      <span style="color:var(--text-muted);font-size:.85rem;">${t('greeting',{u:esc(state.user)})}</span>
-      ${renderLangSelect('appLang')}
-      ${renderThemeSelect()}
-      <button class="btn-ghost btn-small" onclick="handleLogout()">${t('logout')}</button>
-    </div>
-  </div>
-
-  ${notifBanner}
-
-  <div class="stats">
-    <div class="stat"><span class="num">${state.events.length}</span><span class="lbl">${t('statsTotal')}</span></div>
-    <div class="stat completed"><span class="num">${completed}</span><span class="lbl">${t('statsCompleted')}</span></div>
-    <div class="stat pending"><span class="num">${pending}</span><span class="lbl">${t('statsPending')}</span></div>
-  </div>
-
-  <div class="toolbar">
-    <input type="search" placeholder="${t('searchPlaceholder')}" value="${esc(state.search)}" oninput="state.search=this.value; renderListOnly();"/>
-    <button class="btn-ghost" onclick="openGraphModal()">${t('weeklyGraphBtn')}</button>
-    <button class="btn-ghost" onclick="openModal('overviewModal')">${t('overviewBtn')}</button>
-    <button class="btn-ghost" onclick="openModal('aboutModal')">${t('aboutBtn')}</button>
-  </div>
-
-  <div class="card" id="formCard">
-    <h3>${editing ? t('formTitleEdit') : t('formTitleAdd')}</h3>
-    <div class="form-grid">
-      <div class="field full"><label>${t('formName')}</label><input id="in_name" type="text" value="${esc(editing?.name)}"/></div>
-      <div class="field"><label>${t('formDate')}</label><input id="in_date" type="date" value="${esc(editing?.date)}"/></div>
-      <div class="field"><label>${t('formTime')}</label><input id="in_time" type="time" value="${esc(editing?.time)}"/></div>
-      <div class="field"><label>${t('formPhone')}</label><input id="in_phone" type="tel" placeholder="+91XXXXXXXXXX" value="${esc(editing?.phone)}"/></div>
-      <div class="field full"><label>${t('formNote')}</label><input id="in_note" type="text" value="${esc(editing?.note)}"/></div>
-    </div>
-    <div class="form-actions">
-      <button class="btn-primary" onclick="submitEventForm()">${editing ? t('saveBtn') : t('addBtn')}</button>
-      <button class="btn-ghost" onclick="clearForm()">${t('clearBtn')}</button>
-    </div>
-  </div>
-
-  <div id="listWrap">${listHtml}</div>
-
-  <footer class="hint">Data is stored privately in this browser only, under your account.</footer>
-  `;
-}
-function submitEventForm(){
-  const data = {
-    name: document.getElementById('in_name').value.trim(),
-    date: document.getElementById('in_date').value,
-    time: document.getElementById('in_time').value,
-    phone: document.getElementById('in_phone').value.trim(),
-    note: document.getElementById('in_note').value.trim(),
-  };
-  addOrUpdateEvent(data);
-}
-function renderListOnly(){
-  const { groups, total } = groupEvents();
-  let listHtml;
-  if(state.events.length === 0) listHtml = `<div class="empty-state">${t('emptyState')}</div>`;
-  else if(total === 0) listHtml = `<div class="empty-state">${t('noSearchResults')}</div>`;
-  else listHtml = section(t('sectionOverdue'),'overdue',groups.overdue,'overdue')
-      + section(t('sectionToday'),'today',groups.today,'today')
-      + section(t('sectionUpcoming'),'upcoming',groups.upcoming,'upcoming')
-      + section(t('sectionDone'),'done',groups.done,'done');
-  document.getElementById('listWrap').innerHTML = listHtml;
-}
-
-/* ============================= modals ============================= */
-function ensureModals(){
-  if(document.getElementById('overviewModal')) return;
-  const wrap = document.createElement('div');
-  wrap.innerHTML = `
-  <div class="overlay" id="overviewModal">
-    <div class="modal">
-      <h3 id="overviewTitleEl"></h3>
-      <div id="overviewBody"></div>
-      <div class="modal-close"><button class="btn-ghost" onclick="closeModal('overviewModal')"></button></div>
-    </div>
-  </div>
-  <div class="overlay" id="aboutModal">
-    <div class="modal">
-      <h3 id="aboutTitleEl"></h3>
-      <div class="about-body" id="aboutBody"></div>
-      <div class="modal-close"><button class="btn-ghost" onclick="closeModal('aboutModal')"></button></div>
-    </div>
-  </div>
-  <div class="overlay" id="graphModal">
-    <div class="modal">
-      <h3 id="graphTitleEl"></h3>
-      <canvas id="weeklyChart" height="220"></canvas>
-      <div class="modal-close"><button class="btn-ghost" onclick="closeModal('graphModal')"></button></div>
-    </div>
-  </div>`;
-  document.body.appendChild(wrap);
-}
-function openModal(id){
-  ensureModals();
-  if(id === 'overviewModal'){
-    const completed = state.events.filter(e=>e.done).length;
-    const pending = state.events.length - completed;
-    document.getElementById('overviewTitleEl').textContent = t('overviewTitle');
-    document.getElementById('overviewBody').innerHTML = `
-      <div class="row"><span>${t('statsTotal')}</span><strong>${state.events.length}</strong></div>
-      <div class="row"><span>${t('statsCompleted')}</span><strong>${completed}</strong></div>
-      <div class="row"><span>${t('statsPending')}</span><strong>${pending}</strong></div>`;
-  }
-  if(id === 'aboutModal'){
-    document.getElementById('aboutTitleEl').textContent = t('aboutTitle');
-    document.getElementById('aboutBody').textContent = t('aboutBody');
-  }
-  document.querySelectorAll('.modal-close button').forEach(b=> b.textContent = t('close'));
-  document.getElementById(id).classList.add('open');
-}
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-let chartInstance = null;
-function openGraphModal(){
-  ensureModals();
-  document.getElementById('graphTitleEl').textContent = t('chartTitle');
-  document.getElementById('graphModal').classList.add('open');
-  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const now = new Date();
-  const startOfWeek = new Date(now); startOfWeek.setDate(now.getDate()-now.getDay()); startOfWeek.setHours(0,0,0,0);
-  const counts = [0,0,0,0,0,0,0];
-  state.events.forEach(e=>{
-    if(!e.done) return;
-    const d = new Date(e.date+'T00:00:00');
-    if(d >= startOfWeek && d < new Date(startOfWeek.getTime()+7*86400000)){
-      counts[d.getDay()]++;
-    }
+function exportCSV() {
+  if (!state.events.length) return alert("No events to export.");
+  let csv = "ID,Name,Category,Date,Time,Location,RemindBefore,Phone,Priority,Note,Done\n";
+  state.events.forEach(e => {
+    csv += `"${e.id}","${e.name}","${e.category}","${e.date}","${e.time}","${e.location||''}","${e.remindBefore||''}","${e.phone||''}","${e.priority}","${e.note||''}",${e.done}\n`;
   });
-  const ctx = document.getElementById('weeklyChart').getContext('2d');
-  if(chartInstance) chartInstance.destroy();
-  const styles = getComputedStyle(document.documentElement);
-  chartInstance = new Chart(ctx, {
-    type:'bar',
-    data:{ labels: days, datasets:[{ label:t('chartTitle'), data:counts, backgroundColor: styles.getPropertyValue('--accent').trim() || '#D4AF37', borderRadius:5 }]},
-    options:{ responsive:true, plugins:{legend:{display:false}}, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } } }
-  });
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `events_${state.user}.csv`;
+  a.click();
 }
 
-/* ============================= render root ============================= */
-function render(){
-  const root = document.getElementById('root');
-  root.innerHTML = state.user ? renderApp() : renderAuth();
+/* Modals */
+function showOverviewModal() {
+  const total = state.events.length;
+  const completed = state.events.filter(e => e.done).length;
+  const pending = total - completed;
+  showToast(`
+    <b>📋 Event Statistics</b><br>
+    Total Events: <b>${total}</b><br>
+    Completed: <b style="color:var(--success);">${completed}</b><br>
+    Pending: <b style="color:var(--warning);">${pending}</b>
+  `, 8000);
 }
+
+function showWeeklyModal() {
+  showToast(`📊 Activity chart updated in your dashboard.`, 4000);
+}
+
+// Request Notification Permission on load
+if ('Notification' in window && Notification.permission !== "granted") {
+  Notification.requestPermission();
+}
+
+loadEvents();
 render();
-checkReminders();
 </script>
 </body>
 </html>
